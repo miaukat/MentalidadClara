@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentalidad Clara - Tu psicólogo virtual</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="MC2.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <a href="#inicio">
+                <img src="Logo_MC.jpg" alt="Mentalidad Clara">
+            </a>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#servicios">Servicios</a></li>
+                <li><a href="#testimonios">Testimonios</a></li>
+                <li><a href="#contacto" class="btn-nav">Agendar Cita</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="inicio" class="hero">
+        <div class="hero-content">
+            <h1>Tu diario emocional, tu mejor aliado</h1>
+            <p>Descubre cómo gestionar tus emociones y encuentra herramientas para vivir en mayor armonía, paz y felicidad.</p>
+            <div class="hero-buttons">
+                <a href="#servicios" class="btn-primary">Quiero saber más</a>
+                <a href="#contacto" class="btn-secondary">Agendar cita</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="servicios" class="services">
+        <h2>¿Cómo te podemos ayudar?</h2>
+        <p class="section-subtitle">Ofrecemos un espacio confidencial y empático adaptado a tus necesidades.</p>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">🌱</div>
+                <h3>TERAPIA INDIVIDUAL</h3>
+                <p>Un espacio para comprender tus emociones, superar bloqueos, manejar la ansiedad o depresión y recuperar tu equilibrio emocional.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🤝</div>
+                <h3>TERAPIA DE PAREJA</h3>
+                <p>Herramientas de comunicación asertiva para reconectar, resolver conflictos, sanar heridas y reconstruir el compromiso mutuo.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🧸</div>
+                <h3>TERAPIA INFANTIL</h3>
+                <p>Ayudamos a identificar los aspectos del entorno del niño que afectan su desarrollo, orientándolo a él y a su familia.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonios" class="testimonials">
+        <h2>Lo que dicen nuestros pacientes</h2>
+        <div class="testimonials-container">
+            <div class="testimonial-box">
+                <p>"La terapia fue de gran ayuda, me permitió darme cuenta de que lo más importante es uno mismo, aprender a valorarse y ganar seguridad."</p>
+                <h4>- Diego (Terapia Individual)</h4>
+            </div>
+            <div class="testimonial-box">
+                <p>"Nos ha abierto un espacio de encuentro en el cual nuestra relación de pareja ha mejorado la comunicación y el entendimiento familiar."</p>
+                <h4>- Juliana (Terapia de Pareja)</h4>
+            </div>
+        </div>
+    </section>
+
+    <section id="contacto" class="contact">
+        <div class="contact-container">
+            <div class="contact-info">
+                <h2>Realiza un cambio en tu vida ahora</h2>
+                <p>Estamos comprometidos con tu proceso de bienestar.</p>
+                <div class="contact-details">
+                    <p><strong>📞 Teléfono:</strong> +57 316 048 1448</p>
+                    <p><strong>📧 Email:</strong> info@mentalidadclara.com</p>
+                </div>
+            </div>
+            
+            <div class="contact-form">
+                <h3>Agenda tu Consulta</h3>
+                <form action="#">
+                    <div class="form-group">
+                        <label for="id-name">Nombre Completo</label>
+                        <input type="text" id="id-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id-email">Correo Electrónico</label>
+                        <input type="email" id="id-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="motivo">Motivo de Consulta</label>
+                        <select id="motivo">
+                            <option value="individual">Terapia Individual</option>
+                            <option value="pareja">Terapia de Pareja</option>
+                            <option value="infantil">Terapia Infantil</option>
+                            <option value="ansiedad">Ansiedad / Estrés</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensaje adicional</label>
+                        <textarea id="message" rows="4"></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Enviar Solicitud</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Mentalidad Clara. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>

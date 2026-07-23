@@ -1,0 +1,123 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f7f6; 
+    color: #333333;        
+    line-height: 1.6;
+}
+img {
+    width: 120px ; /* Le ponemos !important para obligar al navegador a hacer caso */
+    height: 110px;   /* ¡Esto evitará que se estire! */
+    border-radius: 8px;
+    text-align: left;
+}
+
+/* ENCABEZADO (HEADER) Y LOGO */
+header {
+    background-color: #466C58;
+    color: #ffffff;          
+    padding: 20px;
+    text-align: center;
+}
+
+
+
+ h1 {
+    font-size: 24px;
+    color: #ffffff;      
+}
+
+header p {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/*MENÚ DE NAVEGACIÓN*/
+nav {
+    margin-top: 15px;
+}
+
+nav ul {
+    list-style: none;         /* Quita las viñetas automáticas */
+    display: block;           /* Estructura en bloque */
+    text-align: center;
+}
+
+nav ul li {
+    display: inline-block;    /* Pone los elementos uno al lado del otro */
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #ffffff;
+    text-decoration: none;    /* Quita la línea de subrayado de los enlaces */
+    font-weight: 600;
+    font-size: 15px;
+    transition: color 0.3s ease;
+}
+
+/* Efecto cuando pasas el mouse por encima de los enlaces */
+nav ul li a:hover {
+    color: #4ac2bb;           /* Cambia al turquesa de tu logo */
+}
+
+/*CONTENIDO PRINCIPAL (MAIN Y SECCIONES) */
+main {
+    max-width: 800px;         /* Limita el ancho para que sea fácil de leer */
+    margin: 30px auto;        /* Centra el contenido en la pantalla */
+    padding: 0 20px;
+}
+
+section {
+    background-color: #ffffff; /* Cajas blancas para la información */
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 8px;        /* Bordes suavemente redondeados */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Sombra sutil de fondo */
+}
+
+h2 {
+    color: #466C58;           
+    margin-bottom: 12px;
+    border-left: 4px solid #365B47; /* Una línea decorativa al lado izquierdo */
+    padding-left: 10px;
+}
+
+h3 {
+    color: #25382e;
+    margin: 15px 0 5px 0;
+}
+
+/* El botón de acción */
+button {
+    background-color: #4ac2bb; /* Fondo turquesa */
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0d2c40; /* Cambia al azul oscuro cuando pasas el mouse */
+}
+
+/* PIE DE PÁGINA (FOOTER)*/
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #365B47;
+    color: #ffffff;
+    font-size: 13px;
+    margin-top: 40px;
+}
