@@ -1,0 +1,304 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load tz %}
+
+{% block title %}Mi Historial y Estadísticas - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+        text-align: center;
+        margin-top: 10px;
+    }
+    .calendar-day-header {
+        font-size: 11px;
+        font-weight: bold;
+        color: #2D4A3E;
+        padding-bottom: 5px;
+    }
+    .calendar-day {
+        background: #F4F8F5;
+        border-radius: 8px;
+        padding: 6px 2px;
+        min-height: 48px;
+        font-size: 12px;
+        font-weight: bold;
+        color: #444;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid transparent;
+    }
+    .calendar-day:hover {
+        background: #E2EFE5;
+        border-color: #4A7C59;
+    }
+    .calendar-day.active-filter {
+        background: #4A7C59 !important;
+        color: white !important;
+    }
+    .calendar-day.empty {
+        background: transparent;
+        cursor: default;
+    }
+    .day-emoji {
+        font-size: 16px;
+        margin-top: 2px;
+    }
+    .registro-card {
+        transition: all 0.3s ease;
+    }
+</style>
+
+<div style="max-width: 950px; margin: 40px auto; padding: 20px;">
+    
+    <a href="{% url 'dashboard_paciente' %}" style="text-decoration: none; color: #4A7C59; font-weight: 600; display: inline-block; margin-bottom: 20px;">
+        ← Volver al Panel Principal
+    </a>
+
+    <!-- ESTADÍSTICAS Y RESUMEN -->
+    <div style="background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <h3 style="color: #2D4A3E; margin-bottom: 15px; font-size: 20px;">
+            📊 Resumen Emocional de {{ mes_actual|default:"Este Mes" }}
+        </h3>
+        
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+            <div style="background: white; border-radius: 12px; padding: 18px; flex: 1; min-width: 200px; text-align: center;">
+                <span style="font-size: 13px; color: #666; font-weight: 600; text-transform: uppercase;">Emoción Predominante</span>
+                <p style="font-size: 22px; font-weight: bold; color: #2D4A3E; margin: 8px 0 0 0; text-transform: uppercase;">
+                    {{ emocion_mas_frecuente|default:"SIN REGISTROS" }}
+                </p>
+            </div>
+            <div style="background: white; border-radius: 12px; padding: 18px; flex: 1; min-width: 200px; text-align: center;">
+                <span style="font-size: 13px; color: #666; font-weight: 600; text-transform: uppercase;">Días Registrados</span>
+                <p style="font-size: 22px; font-weight: bold; color: #4A7C59; margin: 8px 0 0 0;">{{ total_registros_mes|default:0 }} días</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DOBLE: GRÁFICA A LA IZQUIERDA Y CALENDARIO A LA DERECHA -->
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: stretch;">
+            
+            <!-- 📊 GRÁFICA DE DONA -->
+            <div style="background: white; border-radius: 12px; padding: 20px; flex: 1; min-width: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h4 style="color: #2D4A3E; font-size: 15px; margin: 0 0 15px 0;">Frecuencia Emocional</h4>
+                {% if chart_data %}
+                    <div style="width: 100%; max-width: 220px;">
+                        <canvas id="graficaEmociones"></canvas>
+                    </div>
+                {% else %}
+                    <p style="font-size: 13px; color: #888;">Registra tus emociones para activar la gráfica.</p>
+                {% endif %}
+            </div>
+
+            <!-- 📅 CALENDARIO INTERACTIVO DEL MES -->
+            <div style="background: white; border-radius: 12px; padding: 20px; flex: 1.2; min-width: 300px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="color: #2D4A3E; font-size: 15px; margin: 0;">📅 Calendario del Mes</h4>
+                    <button id="btn-mostrar-todos" onclick="filtrarPorDia('')" style="background: #E8F5E9; color: #4A7C59; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: none;">
+                        Mostrar Todos
+                    </button>
+                </div>
+                
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">Lun</div>
+                    <div class="calendar-day-header">Mar</div>
+                    <div class="calendar-day-header">Mié</div>
+                    <div class="calendar-day-header">Jue</div>
+                    <div class="calendar-day-header">Vie</div>
+                    <div class="calendar-day-header">Sáb</div>
+                    <div class="calendar-day-header">Dom</div>
+                </div>
+                
+                <!-- Días renderizados mediante JS -->
+                <div id="calendar-body" class="calendar-grid"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- HISTORIAL Y REGISTROS -->
+    <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <h3 id="titulo-historial" style="color: #2D4A3E; margin-bottom: 15px; font-size: 20px;">
+            📅 Historial de Registros Emocionales
+        </h3>
+        
+        <div id="lista-registros" style="display: flex; flex-direction: column; gap: 12px;">
+            {% for reg in mis_registros %}
+                <div class="registro-card" data-fecha="{{ reg.fecha|date:'Y-m-d' }}" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border: 1px solid #E0E0E0; border-radius: 10px; background: #FAFBF9;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <!-- Emoji dinámico desde la property del modelo -->
+                        <span style="font-size: 32px;">{{ reg.emoji }}</span>
+
+                        <div>
+                            <strong style="color: #333; font-size: 15px; display: block; text-transform: uppercase;">
+                                {{ reg.emocion }}
+                            </strong>
+                            <span style="color: #777; font-size: 13px;">
+                                Nota: {% if reg.comentario %}{{ reg.comentario }}{% else %}<em>Sin nota adicional</em>{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="text-align: right;">
+                        <span style="display: block; font-size: 13px; font-weight: 600; color: #4A7C59;">
+                            {{ reg.fecha|localtime|date:"d/m/Y h:i A" }}
+                        </span>
+                        <span style="font-size: 12px; color: #999;">Intensidad: {{ reg.intensidad }}/10</span>
+                    </div>
+                </div>
+            {% empty %}
+                <div style="text-align: center; padding: 25px; color: #666; font-size: 14px;">
+                    <p style="margin: 0;">Aún no tienes registros emocionales para mostrar. 🌱</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<!-- JSON CON LOS DATOS DE LA GRÁFICA -->
+{% if chart_data %}
+  {{ chart_labels|json_script:"labels-data" }}
+  {{ chart_data|json_script:"values-data" }}
+{% endif %}
+
+<!-- JSON CON LOS REGISTROS PARA EL CALENDARIO (SIN CONFLICTOS DE SINTAXIS) -->
+<script id="registros-data" type="application/json">
+[
+    {% for reg in mis_registros %}
+    {
+        "fecha": "{{ reg.fecha|date:'Y-m-d' }}",
+        "emoji": "{{ reg.emoji }}",
+        "emocion": "{{ reg.emocion }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+]
+</script>
+
+<!-- LÓGICA DE JAVASCRIPT PURA -->
+<script>
+    // 1. Cargar registros JSON
+    const listaRegistros = JSON.parse(document.getElementById('registros-data').textContent || '[]');
+    const registrosPorDia = {};
+    
+    listaRegistros.forEach(item => {
+        registrosPorDia[item.fecha] = {
+            emoji: item.emoji,
+            emocion: item.emocion
+        };
+    });
+
+    // 2. Generar el Calendario del Mes
+    function generarCalendario() {
+        const calBody = document.getElementById('calendar-body');
+        if (!calBody) return;
+        calBody.innerHTML = '';
+
+        const hoy = new Date();
+        const año = hoy.getFullYear();
+        const mes = hoy.getMonth();
+
+        const primerDia = new Date(año, mes, 1);
+        const ultimoDia = new Date(año, mes + 1, 0);
+        
+        let diaSemanaInicio = primerDia.getDay() - 1; // Ajuste para iniciar el Lunes
+        if (diaSemanaInicio === -1) diaSemanaInicio = 6; 
+
+        for (let i = 0; i < diaSemanaInicio; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'calendar-day empty';
+            calBody.appendChild(emptyDiv);
+        }
+
+        for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+            const mesFormateado = String(mes + 1).padStart(2, '0');
+            const diaFormateado = String(dia).padStart(2, '0');
+            const fechaKey = `${año}-${mesFormateado}-${diaFormateado}`;
+
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day';
+            dayDiv.setAttribute('onclick', `filtrarPorDia('${fechaKey}', this)`);
+
+            let emojiSpan = '';
+            if (registrosPorDia[fechaKey]) {
+                emojiSpan = `<span class="day-emoji" title="${registrosPorDia[fechaKey].emocion}">${registrosPorDia[fechaKey].emoji}</span>`;
+            }
+
+            dayDiv.innerHTML = `<span>${dia}</span>${emojiSpan}`;
+            calBody.appendChild(dayDiv);
+        }
+    }
+
+    // 3. Filtrar los registros al hacer clic en un día
+    function filtrarPorDia(fechaSelected, elem) {
+        const tarjetas = document.querySelectorAll('.registro-card');
+        const btnMostrarTodos = document.getElementById('btn-mostrar-todos');
+        const titulo = document.getElementById('titulo-historial');
+
+        document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('active-filter'));
+
+        if (!fechaSelected) {
+            tarjetas.forEach(t => t.style.display = 'flex');
+            if (btnMostrarTodos) btnMostrarTodos.style.display = 'none';
+            if (titulo) titulo.innerText = "📅 Historial de Registros Emocionales";
+            return;
+        }
+
+        if (elem) elem.classList.add('active-filter');
+
+        tarjetas.forEach(t => {
+            if (t.getAttribute('data-fecha') === fechaSelected) {
+                t.style.display = 'flex';
+            } else {
+                t.style.display = 'none';
+            }
+        });
+
+        if (btnMostrarTodos) btnMostrarTodos.style.display = 'inline-block';
+        
+        const partes = fechaSelected.split('-');
+        if (titulo) titulo.innerText = `📅 Registros del ${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+    // Inicializar el calendario
+    generarCalendario();
+
+    // 4. Renderizar Gráfica
+    const labelsElem = document.getElementById('labels-data');
+    const valuesElem = document.getElementById('values-data');
+
+    if (labelsElem && valuesElem) {
+        const labels = JSON.parse(labelsElem.textContent || '[]');
+        const dataValues = JSON.parse(valuesElem.textContent || '[]');
+
+        const canvasElem = document.getElementById('graficaEmociones');
+        if (canvasElem && labels.length > 0) {
+            const ctx = canvasElem.getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataValues,
+                        backgroundColor: ['#4A7C59', '#81C784', '#FFD54F', '#E57373', '#64B5F6', '#BA68C8', '#FF8A65']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+    }
+</script>
+{% endblock %}

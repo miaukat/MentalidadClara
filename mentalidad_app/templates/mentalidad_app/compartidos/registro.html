@@ -1,0 +1,148 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Registro - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<div style="min-height: 100vh; background: linear-gradient(rgba(26, 46, 38, 0.85), rgba(45, 74, 62, 0.85)), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
+    
+    <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 40px; width: 100%; max-width: 500px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+        
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h2 style="color: #2D4A3E; margin: 0 0 8px 0; font-size: 26px;">Crear una Cuenta</h2>
+            <p style="color: #666; font-size: 14px; margin: 0;">Únete a Mentalidad Clara y comienza tu proceso de bienestar</p>
+        </div>
+
+        <!-- Mensaje de Error (si Django lo envía) -->
+        {% if error %}
+            <div style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; border: 1px solid #f5c6cb;">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="" id="form-registro">
+            {% csrf_token %}
+
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #2D4A3E; margin-bottom: 5px;">Nombre</label>
+                    <input type="text" name="first_name" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #2D4A3E; margin-bottom: 5px;">Apellido</label>
+                    <input type="text" name="last_name" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #2D4A3E; margin-bottom: 5px;">Nombre de usuario</label>
+                <input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #2D4A3E; margin-bottom: 5px;">Correo Electrónico (Único)</label>
+                <input type="email" name="email" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #2D4A3E; margin-bottom: 5px;">Teléfono</label>
+                <input type="text" name="telefono" placeholder="Opcional" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+            </div>
+
+            <!-- Contraseña con botón de ver/ocultar -->
+            <div style="margin-bottom: 15px; position: relative;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #2D4A3E; margin-bottom: 5px;">Contraseña</label>
+                <div style="position: relative;">
+                    <input type="password" name="password" id="password" required oninput="validarPassword()" style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                    <button type="button" onclick="togglePassword('password', 'icon-eye-1')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; font-size: 16px;">
+                        <span id="icon-eye-1">👁️‍🗨️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Requisitos de la Contraseña (Feedback visual en tiempo real) -->
+            <div id="password-requirements" style="background: #f9fbf9; border: 1px solid #d1e7dd; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 12px; color: #444;">
+                <p style="margin: 0 0 5px 0; font-weight: bold; color: #2D4A3E;">Requisitos de la contraseña:</p>
+                <ul style="margin: 0; padding-left: 15px;">
+                    <li id="req-length" style="color: #d9534f;">Mínimo 8 caracteres</li>
+                    <li id="req-number" style="color: #d9534f;">Al menos un número</li>
+                    <li id="req-letter" style="color: #d9534f;">Al menos una letra</li>
+                </ul>
+            </div>
+
+            <!-- Confirmar Contraseña con botón de ver/ocultar -->
+            <div style="margin-bottom: 25px; position: relative;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #2D4A3E; margin-bottom: 5px;">Confirmar Contraseña</label>
+                <div style="position: relative;">
+                    <input type="password" name="confirm_password" id="confirm_password" required oninput="validarPassword()" style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                    <button type="button" onclick="togglePassword('confirm_password', 'icon-eye-2')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; font-size: 16px;">
+                        <span id="icon-eye-2">👁️‍🗨️</span>
+                    </button>
+                </div>
+                <small id="match-error" style="color: #d9534f; display: none; font-size: 11px; margin-top: 4px;">Las contraseñas no coinciden.</small>
+            </div>
+
+            <button type="submit" id="btn-submit" style="width: 100%; background: #4A7C59; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.3s;">
+                Registrarse
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px; font-size: 13px;">
+            <p style="color: #666; margin: 0;">¿Ya tienes una cuenta? <a href="{% url 'login' %}" style="color: #4A7C59; text-decoration: none; font-weight: bold;">Inicia sesión aquí</a></p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Función para mostrar/ocultar contraseña
+    function togglePassword(fieldId, iconId) {
+        const input = document.getElementById(fieldId);
+        const icon = document.getElementById(iconId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.textContent = "👁️";
+        } else {
+            input.type = "password";
+            icon.textContent = "👁️‍🗨️";
+        }
+    }
+
+    // Función para validar requisitos y coincidencia en tiempo real
+    function validarPassword() {
+        const pass = document.getElementById('password').value;
+        const confirmPass = document.getElementById('confirm_password').value;
+
+        // Validaciones de reglas
+        const hasLength = pass.length >= 8;
+        const hasNumber = /\d/.test(pass);
+        const hasLetter = /[a-zA-Z]/.test(pass);
+
+        // Actualizar colores de los requisitos en la interfaz
+        actualizarRequisito('req-length', hasLength);
+        actualizarRequisito('req-number', hasNumber);
+        actualizarRequisito('req-letter', hasLetter);
+
+        // Validar si coinciden
+        const matchError = document.getElementById('match-error');
+        const match = pass === confirmPass && confirmPass !== "";
+
+        if (confirmPass.length > 0 && !match) {
+            matchError.style.display = 'block';
+        } else {
+            matchError.style.display = 'none';
+        }
+    }
+
+    function actualizarRequisito(elementId, cumple) {
+        const el = document.getElementById(elementId);
+        if (cumple) {
+            el.style.color = '#4A7C59'; // Verde éxito
+            el.innerHTML = '✔ ' + el.textContent.replace(/^[✔✖]\s*/, '');
+        } else {
+            el.style.color = '#d9534f'; // Rojo error
+            el.innerHTML = '✖ ' + el.textContent.replace(/^[✔✖]\s*/, '');
+        }
+    }
+</script>
+{% endblock %}

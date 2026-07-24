@@ -1,0 +1,357 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Panel de Paciente - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<style>
+    body {
+        background: linear-gradient(rgba(245, 247, 246, 0.35), rgba(245, 247, 246, 0.35)), 
+                    url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop') center/cover fixed no-repeat !important;
+    }
+    
+    .encabezado-bienvenida {
+        background: linear-gradient(135deg, rgba(45, 74, 62, 0.65) 0%, rgba(74, 124, 89, 0.65) 100%), 
+            url('{% static "img/fondo_bienvenida.jpg" %}') center/cover no-repeat;
+        color: white;
+        border-radius: 16px;
+        padding: 40px 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    /* Estilos para el Chat Flotante */
+    #btn-chat-flotante {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #4A7C59;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        cursor: pointer;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.3s;
+    }
+    #btn-chat-flotante:hover {
+        background-color: #3b6348;
+    }
+
+    #chat-drawer {
+        position: fixed;
+        top: 0;
+        right: -380px;
+        width: 360px;
+        height: 100%;
+        background: white;
+        box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+        z-index: 10000;
+        transition: right 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+    }
+    #chat-drawer.abierto {
+        right: 0;
+    }
+</style>
+
+<div style="max-width: 1100px; margin: 90px auto 40px auto; padding: 20px;">
+    
+    <!-- Encabezado con imagen de fondo -->
+    <div class="encabezado-bienvenida">
+        <h1 style="margin: 0 0 10px 0; font-size: 30px; font-weight: bold;">
+            ¡Hola, {{ request.user.first_name|default:request.user.username }}! 👋
+        </h1>
+        <p style="margin: 0; opacity: 0.95; font-size: 16px;">
+            Bienvenido/a a tu espacio de bienestar. ¿Qué te gustaría hacer hoy?
+        </p>
+    </div>
+
+    <!-- SECCIÓN DE PENDIENTES (RECTÁNGULO ANCHO) -->
+    <div style="background: white; border-radius: 16px; padding: 20px 30px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h3 style="color: #2D4A3E; margin-bottom: 8px; font-size: 18px;">Tus pendientes de hoy:</h3>
+            <p style="color: #555; margin: 4px 0; font-size: 15px;">
+                📅 Tienes 
+                <a href="{% url 'mis_citas' %}" style="color: #4A7C59; font-weight: bold; text-decoration: underline;" title="Ver mis citas">
+                    {{ citas.count }}
+                </a> 
+                cita(s) confirmada(s) próxima(s).
+            </p>
+            <p style="color: #555; margin: 4px 0; font-size: 15px;">
+                📝 Tienes 
+                <a href="{% url 'mis_actividades' %}" style="color: #4A7C59; font-weight: bold; text-decoration: underline;" title="Ver mis actividades">
+                    {{ actividades.count }}
+                </a> 
+                actividad(es) pendiente(s) por realizar.
+            </p>
+        </div>
+        <div style="font-size: 30px;">
+            📌
+        </div>
+    </div>
+
+    <!-- SECCIÓN: CONOCE A TU TERAPEUTA (RECTÁNGULO ANCHO) -->
+    <div style="background: white; border-radius: 16px; padding: 25px 30px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box;">
+        <h3 style="color: #2D4A3E; margin-bottom: 15px; font-size: 18px;">
+            👨‍⚕️ Conoce a tu Terapeuta
+        </h3>
+
+        {% if terapeuta_asignado %}
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <!-- Foto de perfil del terapeuta -->
+                    <div>
+                        {% if terapeuta_asignado.perfil.foto %}
+                            <img src="{{ terapeuta_asignado.perfil.foto.url }}" alt="Foto del Terapeuta" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #4A7C59;">
+                        {% else %}
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid #4A7C59;">
+                                🧑‍⚕️
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Información detallada -->
+                    <div style="flex: 1; min-width: 220px;">
+                        <h4 style="margin: 0 0 5px 0; color: #2D4A3E; font-size: 20px;">
+                            {{ terapeuta_asignado.first_name|default:terapeuta_asignado.username }} {{ terapeuta_asignado.last_name }}
+                        </h4>
+                        
+                        {% if terapeuta_asignado.perfil.especialidad %}
+                            <p style="margin: 0 0 5px 0; color: #4A7C59; font-weight: 600; font-size: 14px;">
+                                Especialidad: {{ terapeuta_asignado.perfil.especialidad }}
+                            </p>
+                        {% endif %}
+
+                        <p style="margin: 0 0 5px 0; color: #555; font-size: 14px;">
+                            📧 <strong>Correo:</strong> {{ terapeuta_asignado.email }}
+                        </p>
+
+                        {% if terapeuta_asignado.perfil.telefono %}
+                            <p style="margin: 0; color: #555; font-size: 14px;">
+                                📞 <strong>Teléfono:</strong> {{ terapeuta_asignado.perfil.telefono }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botón para ir al perfil completo -->
+                <div>
+                    <a href="{% url 'terapeuta_asignado' %}" style="display: inline-block; background: #4A7C59; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+                        Ver Perfil Completo
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 15px; color: #666;">
+                <p style="margin: 0 0 10px 0; font-size: 15px;">Aún no tienes un terapeuta asignado formalmente.</p>
+                <a href="{% url 'agendar_cita' %}" style="display: inline-block; background: #4A7C59; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+                    Agendar una cita con un especialista
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Grid de Tarjetas de Opciones -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;">
+        
+        <!-- 1. Registrar Emoción -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 45px; margin-bottom: 15px;">😊</div>
+                <h3 style="color: #2D4A3E; margin-bottom: 10px; font-size: 20px;">Registro de Emociones</h3>
+                <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+                    Registra cómo te sientes diariamente y lleva un seguimiento de tu bienestar emocional.
+                </p>
+            </div>
+            <a href="{% url 'registrar_emocion_diario' %}" style="display: block; background: #4A7C59; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Registrar Hoy
+            </a>
+        </div>
+
+        <!-- 2. Mi Historial y Estadísticas -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 45px; margin-bottom: 15px;">📊</div>
+                <h3 style="color: #2D4A3E; margin-bottom: 10px; font-size: 20px;">Mi Historial</h3>
+                <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+                    Consulta tu resumen del mes, estadísticas y el historial de emociones de días anteriores.
+                </p>
+            </div>
+            <a href="{% url 'historial_emociones' %}" style="display: block; background: #4A7C59; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Ver Estadísticas
+            </a>
+        </div>
+
+        <!-- 3. Diario Personal Privado -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 45px; margin-bottom: 15px;">📖</div>
+                <h3 style="color: #2D4A3E; margin-bottom: 10px; font-size: 20px;">Diario Personal</h3>
+                <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+                    Escribe tus pensamientos, experiencias y reflexiones en un espacio completamente privado.
+                </p>
+            </div>
+            <a href="{% url 'diario_personal' %}" style="display: block; background: #4A7C59; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Abrir Mi Diario
+            </a>
+        </div>
+
+        <!-- 4. Agendar Citas -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 45px; margin-bottom: 15px;">📅</div>
+                <h3 style="color: #2D4A3E; margin-bottom: 10px; font-size: 20px;">Agendar Citas</h3>
+                <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+                    Agenda citas con especialistas y recibe acompañamiento psicológico de calidad.
+                </p>
+            </div>
+            <a href="{% url 'agendar_cita' %}" style="display: block; background: #4A7C59; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Agendar Cita
+            </a>
+        </div>
+
+        <!-- 5. Mis Citas -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 45px; margin-bottom: 15px;">🗓️</div>
+                <h3 style="color: #2D4A3E; margin-bottom: 10px; font-size: 20px;">Mis Citas</h3>
+                <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+                    Consulta tus citas programadas, verifica sus horarios o cancélalas si lo necesitas.
+                </p>
+            </div>
+            <a href="{% url 'mis_citas' %}" style="display: block; background: #4A7C59; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Ver Mis Citas
+            </a>
+        </div>
+
+        <!-- 6. Actividades del Terapeuta -->
+        <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 45px; margin-bottom: 15px;">📋</div>
+                <h3 style="color: #2D4A3E; margin-bottom: 10px; font-size: 20px;">Mis Actividades</h3>
+                <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+                    Revisa las tareas, ejercicios y lecturas asignadas por tu especialista.
+                </p>
+            </div>
+            <a href="{% url 'mis_actividades' %}" style="display: block; background: #4A7C59; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                Ver Tareas
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= CHAT FLOTANTE GLOBAL (SÓLO LECTURA) ================= -->
+{% if request.user.is_authenticated %}
+<style>
+    #btn-chat-flotante {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #4A7C59;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        cursor: pointer;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.3s;
+    }
+    #btn-chat-flotante:hover {
+        background-color: #3b6348;
+    }
+
+    .punto-rojo {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #e74c3c;
+        border-radius: 50%;
+        margin-left: 6px;
+    }
+
+    #chat-drawer {
+        position: fixed;
+        top: 0;
+        right: -380px;
+        width: 360px;
+        height: 100%;
+        background: white;
+        box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+        z-index: 100000;
+        transition: right 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+    }
+    #chat-drawer.abierto {
+        right: 0;
+    }
+</style>
+
+<!-- Botón flotante -->
+<button id="btn-chat-flotante" onclick="toggleChat()">
+    💬 Mensajes del Terapeuta 
+    {% if mensajes_nuevos_pendientes %}
+        <span style="font-size: 13px; font-weight: normal;">(Nuevo)</span>
+        <span class="punto-rojo"></span>
+    {% endif %}
+</button>
+
+<!-- Panel lateral -->
+<div id="chat-drawer">
+    <div style="background: #2D4A3E; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-size: 16px;">Buzón de Mensajes</h3>
+        <button onclick="toggleChat()" style="background: none; border: none; color: white; font-size: 22px; cursor: pointer;">&times;</button>
+    </div>
+    
+    <div style="padding: 20px; flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+        <p style="color: #666; font-size: 13px; text-align: center; margin-bottom: 20px;">
+            Este espacio es exclusivo para que leas las indicaciones o notas enviadas por tu terapeuta.
+        </p>
+        
+        {% if mensajes_chat %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for mensaje in mensajes_chat %}
+                    <div style="background: #F9FBF9; border: 1px solid #D1E7DD; border-radius: 12px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 12px; font-weight: bold; color: #4A7C59;">Dr(a). {{ mensaje.remitente.first_name }} {{ mensaje.remitente.last_name }}</span>
+                            <span style="font-size: 11px; color: #777;">{{ mensaje.fecha|date:"d M Y, h:i A" }}</span>
+                        </div>
+                        <p style="margin: 0; font-size: 14px; color: #333; line-height: 1.4;">
+                            {{ mensaje.texto }}
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; color: #888; margin-top: 30px; font-size: 14px;">
+                No hay mensajes recientes para mostrar.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function toggleChat() {
+        const drawer = document.getElementById('chat-drawer');
+        drawer.classList.toggle('abierto');
+    }
+</script>
+{% endif %}
+<!-- ================= FIN CHAT FLOTANTE ================= -->
+{% endblock %}

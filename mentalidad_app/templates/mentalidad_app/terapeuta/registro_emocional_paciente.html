@@ -1,0 +1,228 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Registro Emocional de {{ paciente.usuario.get_full_name|default:paciente.usuario.username }} - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<style>
+    .dia-calendario {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 52px;
+        width: 100%;
+        padding: 6px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        background: #f9fbf9;
+        color: #333;
+        gap: 2px;
+        box-sizing: border-box;
+        transition: background 0.2s, transform 0.1s;
+    }
+    .dia-calendario:hover {
+        background: #e2ede4;
+    }
+    .dia-seleccionado {
+        background: #2D4A3E !important;
+        color: white !important;
+    }
+    .dia-seleccionado span {
+        color: white !important;
+    }
+    .dia-registrado {
+        background: #e8f5e9 !important;
+        color: #2e7d32 !important;
+    }
+    .emoji-dia {
+        font-size: 15px;
+        line-height: 1;
+        pointer-events: none;
+    }
+</style>
+
+<div style="min-height: 100vh; background: linear-gradient(rgba(26, 46, 38, 0.88), rgba(45, 74, 62, 0.88)), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; background-attachment: fixed; padding: 100px 20px 40px 20px;">
+    
+    <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- Header informativo del paciente -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: #2D4A3E; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">📈</div>
+                <div>
+                    <h2 style="margin: 0; color: #2D4A3E; font-size: 20px;">Seguimiento Emocional</h2>
+                    <p style="margin: 3px 0 0 0; color: #555; font-size: 14px;">Paciente: <strong>{{ paciente.usuario.get_full_name|default:paciente.usuario.username }}</strong></p>
+                </div>
+            </div>
+
+            <div>
+                <a href="{% url 'detalle_paciente_terapeuta' paciente.id %}" style="background: #2D4A3E; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    ⬅️ Volver al Perfil del Paciente
+                </a>
+            </div>
+        </div>
+
+        <!-- Sección 1: Calendario / Filtro de Fechas -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+            <h3 style="color: #2D4A3E; margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                📅 Calendario y Registros del Mes ({{ fecha_obj|date:"F Y"|title }})
+            </h3>
+
+            <!-- Navegación del Calendario -->
+            <div style="margin-top: 20px; overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                    <thead>
+                        <tr style="color: #2D4A3E; font-size: 14px;">
+                            <th style="padding: 8px;">Lun</th>
+                            <th style="padding: 8px;">Mar</th>
+                            <th style="padding: 8px;">Mié</th>
+                            <th style="padding: 8px;">Jue</th>
+                            <th style="padding: 8px;">Vie</th>
+                            <th style="padding: 8px;">Sáb</th>
+                            <th style="padding: 8px;">Dom</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for semana in dias_matriz %}
+                        <tr>
+                            {% for dia in semana %}
+                            <td style="padding: 4px; border: 1px solid #eee; width: 14%; vertical-align: middle;">
+                                {% if dia != 0 %}
+                                    {% with d_str=dia|stringformat:"02d" m_str=fecha_obj.month|stringformat:"02d" y_str=fecha_obj.year|stringformat:"04d" %}
+                                    
+                                    <a href="?fecha_registro={{ y_str }}-{{ m_str }}-{{ d_str }}" 
+                                       class="dia-calendario {% if dia == fecha_obj.day %}dia-seleccionado{% elif dia in registros_mes_dict %}dia-registrado{% endif %}">
+                                        <span style="pointer-events: none;">{{ dia }}</span>
+                                        
+                                        {% if dia in registros_mes_dict %}
+                                            <span class="emoji-dia" data-dia="{{ dia }}"></span>
+                                        {% endif %}
+                                    </a>
+
+                                    {% endwith %}
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sección 2: Registros Emocionales del Día Seleccionado -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+            <h3 style="color: #2D4A3E; margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                📝 Registros del Día ({{ fecha_seleccionada }})
+            </h3>
+
+            <div style="margin-top: 15px;">
+                {% if registros_emocionales %}
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        {% for reg in registros_emocionales %}
+                            <div style="background: #f9fbf9; padding: 15px; border-radius: 10px; border: 1px solid #d1e7dd;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h4 style="margin: 0; color: #2D4A3E; font-size: 15px;">💡 Emoción: {{ reg.emocion }} (Intensidad: {{ reg.intensidad }}/10)</h4>
+                                    <span style="font-size: 12px; color: #555; background: #e2e8f0; padding: 3px 8px; border-radius: 6px; font-weight: 600;">
+                                        ⏰ {{ reg.fecha|date:"H:i" }} hrs
+                                    </span>
+                                </div>
+                                {% if reg.comentario %}
+                                    <p style="margin: 0; font-size: 14px; color: #444; background: white; padding: 10px; border-radius: 6px; border: 1px solid #eee;">
+                                        {{ reg.comentario }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="padding: 20px; text-align: center; color: #777;">
+                        <p style="font-size: 14px; margin: 0;">No hay registros emocionales guardados para este día.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sección 3: Gráficos de Frecuencia Emocional del Mes -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+            <h3 style="color: #2D4A3E; margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                📊 Frecuencia de Emociones del Mes
+            </h3>
+
+            <div style="margin-top: 20px; position: relative; height: 300px; width: 100%;">
+                {% if etiquetas_emociones %}
+                    <canvas id="graficoEmociones"></canvas>
+                {% else %}
+                    <div style="padding: 40px; text-align: center; color: #777;">
+                        <p style="font-size: 14px; margin: 0;">Aún no hay suficientes datos registrados este mes para generar la gráfica.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Scripts de Emojis y Gráficos -->
+{{ emojis_mes_dict|json_script:"emojis-mes-data" }}
+
+{% if etiquetas_emociones %}
+    {{ etiquetas_emociones|json_script:"etiquetas-data" }}
+    {{ conteo_emociones|json_script:"conteo-data" }}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Inyectar automáticamente los emojis en los días correspondientes del calendario
+        const emojisDataElement = document.getElementById('emojis-mes-data');
+        if (emojisDataElement) {
+            const emojisMes = JSON.parse(emojisDataElement.textContent);
+            document.querySelectorAll('.emoji-dia').forEach(span => {
+                const diaNum = span.getAttribute('data-dia');
+                if (emojisMes[diaNum]) {
+                    span.textContent = emojisMes[diaNum];
+                }
+            });
+        }
+
+        // 2. Renderizar gráfico de Chart.js si existen datos
+        const etiquetasDataElem = document.getElementById('etiquetas-data');
+        const conteoDataElem = document.getElementById('conteo-data');
+        
+        if (etiquetasDataElem && conteoDataElem) {
+            const etiquetasEmociones = JSON.parse(etiquetasDataElem.textContent);
+            const conteoEmociones = JSON.parse(conteoDataElem.textContent);
+
+            const ctx = document.getElementById('graficoEmociones').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: etiquetasEmociones,
+                    datasets: [{
+                        label: 'Cantidad de Registros',
+                        data: conteoEmociones,
+                        backgroundColor: 'rgba(74, 124, 89, 0.7)',
+                        borderColor: 'rgba(45, 74, 62, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

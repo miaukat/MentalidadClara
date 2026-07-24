@@ -1,0 +1,70 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<div style="min-height: 100vh; background: linear-gradient(rgba(26, 46, 38, 0.88), rgba(45, 74, 62, 0.88)), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; background-attachment: fixed; padding: 100px 20px 40px 20px;">
+    
+    <div style="max-width: 1000px; margin: 0 auto;">
+        
+        <!-- Tarjeta de Información General de la Categoría -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 30px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="width: 70px; height: 70px; border-radius: 50%; background: #2D4A3E; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white;">🕒</div>
+                <div>
+                    <h2 style="margin: 0 0 5px 0; color: #2D4A3E; font-size: 22px;">{{ titulo }}</h2>
+                    <p style="margin: 0; color: #666; font-size: 14px;">Visualiza el detalle día a día y los pacientes asignados en esta franja.</p>
+                </div>
+            </div>
+            <div>
+                <span style="background: #e1f5fe; color: #0288d1; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600;">Gestión Activa</span>
+            </div>
+        </div>
+
+        <!-- Sección de Listado de Horarios Día a Día -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); margin-bottom: 25px;">
+            <h3 style="color: #2D4A3E; margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                📅 Horarios Registrados y Pacientes Asignados
+            </h3>
+            
+            <div style="margin-top: 15px;">
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% for h in horarios %}
+                    <li style="background: #f9fbf9; padding: 15px; border-radius: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee;">
+                        <div>
+                            <span style="font-weight: 600; color: #2D4A3E; font-size: 15px;">📅 {{ h.fecha }}</span>
+                            <span style="color: #555; margin-left: 12px; font-size: 14px;">⏰ De {{ h.hora_inicio|time:"h:i A" }} a {{ h.hora_fin|time:"h:i A" }}</span>
+                            <div style="font-size: 13px; margin-top: 6px; color: #555;">
+                                {% if h.paciente %}
+                                    👤 <strong>Paciente asignado:</strong> {{ h.paciente.get_full_name|default:h.paciente.username }}
+                                {% else %}
+                                    🟢 <em style="color: #2e7d32;">Disponible (Sin paciente reservado)</em>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <form method="POST" action="{% url 'eliminar_horario_terapeuta' h.id %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('¿Estás seguro de eliminar este espacio de horario?');" style="background: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 600;">Eliminar</button>
+                        </form>
+                    </li>
+                    {% empty %}
+                    <div style="padding: 30px; text-align: center; color: #777;">
+                        <p style="font-size: 15px; margin: 0;">No hay horarios registrados en esta categoría.</p>
+                        <p style="font-size: 13px; color: #999; margin-top: 5px;">Utiliza la sección principal de gestión para agregar disponibilidad.</p>
+                    </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Botón de Retorno -->
+        <div>
+            <a href="{% url 'gestionar_horarios_terapeuta' %}" style="background: rgba(255, 255, 255, 0.9); color: #2D4A3E; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                ⬅️ Volver a Gestión de Horarios
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

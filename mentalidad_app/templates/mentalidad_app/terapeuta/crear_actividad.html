@@ -1,0 +1,256 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Asignar Actividad - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- ESTILOS CSS LIMPIOS PARA EL CALENDARIO -->
+<style>
+    .dia-cal {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 38px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 600;
+        transition: all 0.2s;
+        border: 1px solid #E0E0E0;
+        background-color: #FFFFFF;
+    }
+
+    .dia-cal:hover {
+        background-color: #F0Fdf4;
+    }
+
+    .dia-cal.dia-seleccionado {
+        border: 2px solid #2D4A3E !important;
+        background-color: #E8F5E9 !important;
+    }
+</style>
+
+<div style="min-height: 100vh; background: linear-gradient(rgba(26, 46, 38, 0.88), rgba(45, 74, 62, 0.88)), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; background-attachment: fixed; padding: 100px 20px 40px 20px;">
+    
+    <div style="max-width: 1100px; margin: 0 auto;">
+        
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 35px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            
+            <h2 style="color: #2D4A3E; margin-top: 0; margin-bottom: 8px; font-size: 22px; border-bottom: 2px solid #E8F5E9; padding-bottom: 12px;">
+                📝 Asignar Actividad Terapéutica Personalizada
+            </h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 25px;">
+                Revisa el estado emocional del paciente por fecha y asígnale un ejercicio enfocado en sus necesidades.
+            </p>
+
+            <!-- Selector de Paciente -->
+            <form method="GET" id="formPaciente" style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 600; color: #2D4A3E; margin-bottom: 8px; font-size: 14px;">Seleccionar Paciente:</label>
+                <select name="paciente_id" onchange="document.getElementById('formPaciente').submit()" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; background: white; color: #333;">
+                    <option value="">-- Elige un paciente de tu lista --</option>
+                    {% for p in pacientes %}
+                        <option value="{{ p.id }}" {% if paciente_seleccionado and paciente_seleccionado.id == p.id %}selected{% endif %}>
+                            {{ p.usuario.first_name }} {{ p.usuario.last_name }} ({{ p.usuario.username }})
+                        </option>
+                    {% endfor %}
+                </select>
+                <!-- Mantener la fecha al cambiar de paciente -->
+                <input type="hidden" name="fecha_registro" value="{{ fecha_seleccionada }}">
+            </form>
+
+            {% if paciente_seleccionado %}
+                
+                <!-- SECCIÓN DE DOS COLUMNAS -->
+                <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; margin-bottom: 30px;">
+                    
+                    <!-- Columna 1: CALENDARIO E HISTORIAL DE EMOCIONES -->
+                    <div style="background: #F9FBF9; border: 1px solid #D1E7DD; border-radius: 12px; padding: 20px; display: flex; flex-direction: column;">
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">
+                            <h3 style="color: #2D4A3E; margin: 0; font-size: 15px;">
+                                📅 Calendario del Paciente
+                            </h3>
+                            <span style="font-size: 12px; font-weight: bold; color: #4A7C59;">
+                                {{ fecha_obj|date:"F Y"|title }}
+                            </span>
+                        </div>
+
+                        <!-- CUADRÍCULA INTERACTIVA DEL CALENDARIO -->
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; margin-bottom: 15px;">
+                            <!-- Días de la semana -->
+                            <div style="font-size: 11px; font-weight: bold; color: #666;">Lu</div>
+                            <div style="font-size: 11px; font-weight: bold; color: #666;">Ma</div>
+                            <div style="font-size: 11px; font-weight: bold; color: #666;">Mi</div>
+                            <div style="font-size: 11px; font-weight: bold; color: #666;">Ju</div>
+                            <div style="font-size: 11px; font-weight: bold; color: #666;">Vi</div>
+                            <div style="font-size: 11px; font-weight: bold; color: #666;">Sá</div>
+                            <div style="font-size: 11px; font-weight: bold; color: #666;">Do</div>
+
+                            {% for semana in dias_matriz %}
+                                {% for dia in semana %}
+                                    {% if dia == 0 %}
+                                        <div></div>
+                                    {% else %}
+                                        <!-- Enlace dinámico utilizando las clases CSS definidas al inicio -->
+                                        <a href="?paciente_id={{ paciente_seleccionado.id }}&fecha_registro={{ fecha_obj|date:'Y-m' }}-{% if dia < 10 %}0{% endif %}{{ dia }}" 
+                                           class="dia-cal {% if dia == fecha_obj.day %}dia-seleccionado{% endif %}">
+                                            
+                                            <span style="color: #333;">{{ dia }}</span>
+                                            
+                                            <!-- Indicador visual si el paciente registró algo este día -->
+                                            {% for key, reg in registros_mes_dict.items %}
+                                                {% if key == dia %}
+                                                    <span style="font-size: 10px; margin-top: -2px;" title="{{ reg.emocion }}">
+                                                        {% if reg.emocion == 'ANSIOSO' or reg.emocion == 'Ansioso' %}😰
+                                                        {% elif reg.emocion == 'FRUSTRADO' or reg.emocion == 'Frustrado' %}😤
+                                                        {% elif reg.emocion == 'FELIZ' or reg.emocion == 'Feliz' %}😊
+                                                        {% elif reg.emocion == 'TRISTE' or reg.emocion == 'Triste' %}😢
+                                                        {% else %}🟢{% endif %}
+                                                    </span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- HISTORIAL Y REGISTROS DEL DÍA PULSADO -->
+                        <div style="border-top: 1px dashed #A3C1AD; padding-top: 12px; margin-top: auto;">
+                            <h4 style="color: #2D4A3E; margin: 0 0 10px 0; font-size: 13px;">
+                                📋 Detalle del día ({{ fecha_seleccionada }}):
+                            </h4>
+
+                            {% if registros_emocionales %}
+                                <div style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px;">
+                                    {% for reg in registros_emocionales %}
+                                        <div style="background: white; border: 1px solid #E0E0E0; border-radius: 8px; padding: 10px;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                                <span style="font-weight: 600; color: #4A7C59; font-size: 13px;">
+                                                    <!-- Emoji dinámico para la tarjeta de detalle -->
+                                                    {% if reg.emocion == 'ANSIOSO' or reg.emocion == 'Ansioso' %}😰
+                                                    {% elif reg.emocion == 'FRUSTRADO' or reg.emocion == 'Frustrado' %}😤
+                                                    {% elif reg.emocion == 'FELIZ' or reg.emocion == 'Feliz' %}😊
+                                                    {% elif reg.emocion == 'TRISTE' or reg.emocion == 'Triste' %}😢
+                                                    {% else %}🟢{% endif %}
+
+                                                    {{ reg.emocion|default:"Sin emoción" }} (Intensidad: {{ reg.intensidad|default:"N/A" }}/10)
+                                                </span>
+                                                <span style="font-size: 11px; color: #888;">
+                                                    {{ reg.fecha|date:"h:i A" }}
+                                                </span>
+                                            </div>
+                                            <p style="margin: 0; font-size: 12px; color: #444; background: #F8F9FA; padding: 6px; border-radius: 4px; border-left: 3px solid #4A7C59;">
+                                                {% if reg.nota %}"{{ reg.nota }}"{% elif reg.motivo %}"{{ reg.motivo }}"{% elif reg.comentario %}"{{ reg.comentario }}"{% else %}<em>Sin notas adicionales en este registro.</em>{% endif %}
+                                            </p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div style="text-align: center; color: #777; font-size: 12px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #E0E0E0;">
+                                    No hay registros emocionales para el día seleccionado ({{ fecha_seleccionada }}).
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    <!-- Columna 2: Gráfica de Emociones del Mes -->
+                    <div style="background: #F9FBF9; border: 1px solid #D1E7DD; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <h3 style="color: #2D4A3E; margin-top: 0; font-size: 15px; margin-bottom: 15px; width: 100%; text-align: left;">
+                            📊 Emociones Más Frecuentes (Este Mes)
+                        </h3>
+                        
+                        {% if conteo_emociones %}
+                            <div style="width: 100%; max-width: 280px; height: 210px; position: relative;">
+                                <canvas id="graficoEmociones"></canvas>
+                            </div>
+                        {% else %}
+                            <div style="margin: auto; text-align: center; color: #777; font-size: 13px; padding: 20px;">
+                                <p style="margin: 0;">El paciente no registra emociones este mes.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <!-- Formulario para Asignar la Actividad -->
+                <form method="POST" style="background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 25px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="paciente_id" value="{{ paciente_seleccionado.id }}">
+
+                    <h3 style="color: #2D4A3E; margin-top: 0; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                        Redactar Ejercicio para {{ paciente_seleccionado.usuario.first_name }}
+                    </h3>
+
+                    <div style="margin-bottom: 15px;">
+                        <label for="titulo" style="display: block; font-weight: 600; color: #2D4A3E; margin-bottom: 6px; font-size: 14px;">Título de la Actividad:</label>
+                        <input type="text" id="titulo" name="titulo" required placeholder="Ej: Ejercicio de respiración consciente" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px;">
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label for="descripcion" style="display: block; font-weight: 600; color: #2D4A3E; margin-bottom: 6px; font-size: 14px;">Descripción e Instrucciones:</label>
+                        <textarea id="descripcion" name="descripcion" rows="5" required placeholder="Indica los pasos que el paciente debe seguir..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; resize: vertical;"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <button type="submit" style="background: #2D4A3E; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; flex: 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                            ✨ Guardar y Asignar Actividad
+                        </button>
+                        <a href="{% url 'dashboard_terapeuta' %}" style="background: #e0e0e0; color: #333; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; text-align: center; font-size: 14px; display: inline-flex; align-items: center; justify-content: center;">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+
+                {% if conteo_emociones %}
+                    <!-- Convierte las variables de Python a JSON limpio y seguro -->
+                    {{ etiquetas_emociones|json_script:"etiquetas-data" }}
+                    {{ conteo_emociones|json_script:"conteo-data" }}
+
+                    <script>
+                        const etiquetas = JSON.parse(document.getElementById('etiquetas-data').textContent);
+                        const conteo = JSON.parse(document.getElementById('conteo-data').textContent);
+
+                        const ctx = document.getElementById('graficoEmociones').getContext('2d');
+                        const graficoEmociones = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: etiquetas,
+                                datasets: [{
+                                    label: 'Veces sentida',
+                                    data: conteo,
+                                    backgroundColor: [
+                                        '#4A7C59', '#68B0AB', '#8FC0A9', '#C8D6AF', '#F4F1DE', '#E07A5F'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: { font: { size: 11 } }
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+                {% endif %}
+
+            {% else %}
+                <div style="background: #F9FBF9; border: 1px dashed #A3C1AD; border-radius: 12px; padding: 30px; text-align: center; color: #666; font-size: 14px;">
+                    👆 Selecciona un paciente arriba en el menú para ver sus registros diarios y su gráfica mensual.
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

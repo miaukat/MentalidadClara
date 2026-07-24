@@ -1,0 +1,46 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Confirmar Cita - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<style>
+    /* Ocultar la barra de navegación superior en esta vista específica */
+    header, nav, .navbar, .menu-superior {
+        display: none !important;
+    }
+</style>
+
+<!-- Fondo con imagen en tonos verdes y tranquilidad -->
+<div style="background-image: linear-gradient(rgba(45, 74, 62, 0.65), rgba(45, 74, 62, 0.65)), url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1600&auto=format&fit=crop'); background-size: cover; background-position: center; min-height: 85vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
+    
+    <!-- Cuadro central flotante -->
+    <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; padding: 35px; width: 100%; max-width: 550px; box-shadow: 0 15px 45px rgba(0,0,0,0.3);">
+        <h3 style="color: #2D4A3E; margin-top: 0; margin-bottom: 20px; font-size: 22px; text-align: center; border-bottom: 2px solid #E8F5E9; padding-bottom: 12px;">Confirmación de Cita Médica</h3>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Detalles de la cita -->
+            <div style="margin-bottom: 20px; background: #F9FBF9; border: 1px solid #D1E7DD; padding: 18px; border-radius: 12px;">
+                <p style="margin: 0 0 10px 0; font-size: 15px; color: #2D4A3E;"><strong>Terapeuta:</strong> Dr(a). {{ horario.terapeuta.get_full_name|default:horario.terapeuta.username }}</p>
+                <p style="margin: 0 0 10px 0; font-size: 15px; color: #2D4A3E;">📅 <strong>Día y Fecha:</strong> {{ horario.fecha|date:"l, d \d\e F \d\e Y" }}</p>
+                <p style="margin: 0; font-size: 15px; color: #2D4A3E;">⏰ <strong>Hora:</strong> {{ horario.hora_inicio|time:"h:i A" }} - {{ horario.hora_fin|time:"h:i A" }}</p>
+            </div>
+
+            <!-- Motivo de consulta -->
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #333;">Motivo de Consulta</label>
+                <textarea name="motivo" rows="3" placeholder="Explica brevemente la razón de la consulta..." required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; box-sizing: border-box;"></textarea>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" name="confirmar" style="flex: 1; padding: 12px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; background-color: #4A7C59; color: white;">Confirmar Cita</button>
+                <button type="submit" name="rechazar" style="flex: 1; padding: 12px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; background-color: #d9534f; color: white;">Rechazar / Volver</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #F4F8F5; margin: 0; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        
+        <!-- Encabezado -->
+        <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #E8F5E9;">
+            <h1 style="color: #2D4A3E; margin: 0; font-size: 24px;">🌱 ¡Bienvenido/a a Mentalidad Clara!</h1>
+        </div>
+
+        <!-- Mensaje de Bienvenida -->
+        <div style="padding: 20px 0; color: #444; line-height: 1.6;">
+            <p style="font-size: 16px;">Hola <strong>{{ usuario.first_name|default:usuario.username }}</strong>,</p>
+            <p>Nos alegra mucho acompañarte en este camino hacia tu bienestar emocional. Tu espacio ya está listo para empezar.</p>
+
+            <h3 style="color: #2D4A3E; margin-top: 25px;">🚀 ¿Qué puedes hacer en la aplicación?</h3>
+            
+            <ul style="padding-left: 20px;">
+                <li style="margin-bottom: 10px;">
+                    <strong>📊 Registro Emocional y Calendario:</strong> Registra cómo te sientes día a día, asigna emojis y visualiza tus estadísticas en la gráfica de emociones.
+                </li>
+                <li style="margin-bottom: 10px;">
+                    <strong>📖 Diario Personal Privado:</strong> Un espacio 100% seguro para escribir tus reflexiones diarias, adjuntar fotos/videos y proteger tus escritos con un PIN de 6 dígitos.
+                </li>
+                <li style="margin-bottom: 10px;">
+                    <strong>👨‍⚕️ Terapeutas y Citas:</strong> Explora perfiles de profesionales, selecciona a tus favoritos y gestiona tu acompañamiento.
+                </li>
+            </ul>
+
+            <!-- Sección de Contacto/Soporte -->
+            <div style="background: #E8F5E9; border-radius: 12px; padding: 20px; margin-top: 30px;">
+                <h4 style="color: #2D4A3E; margin: 0 0 10px 0;">💬 ¿Necesitas ayuda u orientación?</h4>
+                <p style="margin: 0; font-size: 14px; color: #333;">
+                    Si tienes dudas sobre cómo usar la plataforma o necesitas soporte, estamos para ti:
+                </p>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 14px; color: #2D4A3E; font-weight: bold;">
+                    <li>📧 Correo de soporte: <a href="mentalidadclara.soporte@gmail.com" style="color: #4A7C59;">soporte@mentalidadclara.com</a></li>
+                    <li>📱 WhatsApp / Atención: +57 315 258 4556</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Pie de página -->
+        <div style="text-align: center; border-top: 1px solid #EEE; padding-top: 15px; font-size: 12px; color: #888;">
+            <p>© 2026 Mentalidad Clara - Tu espacio seguro para el bienestar emocional.</p>
+        </div>
+
+    </div>
+</body>
+</html>

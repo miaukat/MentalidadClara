@@ -1,0 +1,62 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Mis Citas - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<div style="max-width: 900px; margin: 90px auto 40px auto; padding: 20px;">
+    
+    <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+        <h2 style="color: #2D4A3E; margin-bottom: 10px; font-size: 26px;">Mis Citas Médicas</h2>
+        <p style="color: #666; margin-bottom: 25px; font-size: 15px;">
+            Aquí puedes consultar el estado de tus citas programadas con los especialistas o cancelarlas si lo necesitas.
+        </p>
+
+        {% if citas %}
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                {% for cita in citas %}
+                    <div style="border: 1px solid #E1E8E4; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; background: #F9FBF9;">
+                        <div>
+                            <h4 style="color: #2D4A3E; margin: 0 0 8px 0; font-size: 18px;">
+                                Terapeuta: {{ cita.terapeuta.get_full_name|default:cita.terapeuta.username }}
+                            </h4>
+                            <p style="margin: 4px 0; color: #555; font-size: 14px;">
+                                📅 <strong>Fecha:</strong> {{ cita.horario.fecha }}
+                            </p>
+                            <p style="margin: 4px 0; color: #555; font-size: 14px;">
+                                ⏰ <strong>Hora:</strong> {{ cita.horario.hora_inicio }} - {{ cita.horario.hora_fin }}
+                            </p>
+                            <p style="margin: 4px 0; color: #555; font-size: 14px;">
+                                📌 <strong>Estado:</strong> <span style="color: #4A7C59; font-weight: bold;">{{ cita.estado }}</span>
+                            </p>
+                        </div>
+                        
+                        <!-- Formulario para cancelar cita -->
+                        <div>
+                            <form action="{% url 'cancelar_cita' cita.id %}" method="POST" onsubmit="return confirm('¿Estás segura de que deseas cancelar esta cita?');">
+                                {% csrf_token %}
+                                <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;">
+                                    Cancelar Cita
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 40px; background: #F9FBF9; border-radius: 12px; border: 1px dashed #D1DED6;">
+                <p style="color: #666; font-size: 16px; margin-bottom: 15px;">No tienes citas agendadas en este momento.</p>
+                <a href="{% url 'agendar_cita' %}" style="background: #4A7C59; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                    Agendar una cita ahora
+                </a>
+            </div>
+        {% endif %}
+        
+        <div style="margin-top: 30px;">
+            <a href="{% url 'dashboard_paciente' %}" style="color: #4A7C59; text-decoration: none; font-weight: 600; font-size: 14px;">
+                ← Volver al Panel Principal
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

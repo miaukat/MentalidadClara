@@ -1,0 +1,112 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Mi Terapeuta - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<style>
+    body {
+        background: linear-gradient(rgba(245, 247, 246, 0.35), rgba(245, 247, 246, 0.35)), 
+                    url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop') center/cover fixed no-repeat !important;
+    }
+</style>
+
+<div style="max-width: 800px; margin: 90px auto 40px auto; padding: 20px;">
+    
+    <div style="background: white; border-radius: 16px; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+        <h2 style="color: #2D4A3E; margin-bottom: 25px; font-size: 24px; border-bottom: 2px solid #f0f2f1; padding-bottom: 12px;">
+            👨‍⚕️ Mi Terapeuta Asignado
+        </h2>
+
+        {% if terapeuta_asignado %}
+            <div style="display: flex; align-items: flex-start; gap: 30px; flex-wrap: wrap;">
+                <!-- Foto de perfil -->
+                <div style="text-align: center;">
+                    {% if terapeuta_asignado.perfil.foto %}
+                        <img src="{{ terapeuta_asignado.perfil.foto.url }}" alt="Foto del Terapeuta" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #4A7C59; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    {% else %}
+                        <div style="width: 120px; height: 120px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 4px solid #4A7C59;">
+                            🧑‍⚕️
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Detalles e Información -->
+                <div style="flex: 1; min-width: 280px;">
+                    <h3 style="margin: 0 0 8px 0; color: #2D4A3E; font-size: 24px;">
+                        {{ terapeuta_asignado.first_name|default:terapeuta_asignado.username }} {{ terapeuta_asignado.last_name }}
+                    </h3>
+                    
+                    {% if terapeuta_asignado.perfil.especialidad %}
+                        <p style="margin: 0 0 15px 0; color: #4A7C59; font-weight: 600; font-size: 16px;">
+                            Especialidad: {{ terapeuta_asignado.perfil.especialidad }}
+                        </p>
+                    {% endif %}
+
+                    <!-- Biografía ampliada -->
+                    {% if terapeuta_asignado.perfil.biografia %}
+                        <div style="margin-bottom: 20px; color: #555; font-size: 15px; line-height: 1.6; background: #f9fbf9; padding: 15px; border-radius: 10px; border-left: 4px solid #4A7C59;">
+                            <strong>Acerca de mí:</strong>
+                            <p style="margin: 8px 0 0 0;">{{ terapeuta_asignado.perfil.biografia }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; color: #444; background: #fdfdfd; padding: 15px; border-radius: 10px; border: 1px solid #eee;">
+                        <span>📧 <strong>Correo electrónico:</strong> {{ terapeuta_asignado.email }}</span>
+                        {% if terapeuta_asignado.perfil.telefono %}
+                            <span>📞 <strong>Teléfono de contacto:</strong> {{ terapeuta_asignado.perfil.telefono }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE REPORTES DE COMPORTAMIENTO / PROCESO -->
+            <div style="margin-top: 35px; border-top: 2px solid #f0f2f1; padding-top: 25px;">
+                <h3 style="color: #2D4A3E; margin-bottom: 15px; font-size: 20px;">
+                    📋 Reportes y Notas de tu Terapeuta
+                </h3>
+
+                {% if reportes %}
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        {% for reporte in reportes %}
+                            <div style="background: #fdfdfd; border: 1px solid #e2e8f0; border-left: 4px solid #2D4A3E; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 5px;">
+                                    <h4 style="margin: 0; color: #2D4A3E; font-size: 17px;">
+                                        📌 {{ reporte.tipo_comportamiento }}
+                                    </h4>
+                                    <span style="font-size: 13px; color: #666; background: #edf2f7; padding: 3px 8px; border-radius: 6px;">
+                                        📅 {{ reporte.fecha|date:"d M, Y - H:i" }}
+                                    </span>
+                                </div>
+                                {% if reporte.descripcion %}
+                                    <p style="margin: 0; color: #4a5568; font-size: 14px; line-height: 1.6; white-space: pre-line;">
+                                        {{ reporte.descripcion }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="background: #f9fafb; border: 1px dashed #cbd5e0; border-radius: 10px; padding: 20px; text-align: center; color: #718096;">
+                        <p style="margin: 0; font-size: 14px;">Aún no tienes reportes u observaciones registradas por tu terapeuta.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 30px; text-align: right;">
+                <a href="{% url 'dashboard_paciente' %}" style="background: #e0e0e0; color: #333; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+                    Volver al Panel
+                </a>
+            </div>
+
+        {% else %}
+            <div style="text-align: center; padding: 30px; color: #666;">
+                <p style="margin: 0 0 15px 0; font-size: 16px;">Aún no tienes un terapeuta asignado formalmente en el sistema.</p>
+                <a href="{% url 'agendar_cita' %}" style="display: inline-block; background: #4A7C59; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 600;">
+                    Agendar una cita con un especialista
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

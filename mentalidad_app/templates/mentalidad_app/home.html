@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}Mentalidad Clara - Tu psicólogo virtual{% endblock %}
+    </title>
+    <!-- Fuentes tipográficas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Enlace a tu CSS estático -->
+    <link rel="stylesheet" href="{% static 'css/MC.css' %}">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <a href="/">
+                <img src="{% static 'img/Logo_MC.jpg' %}" alt="Mentalidad Clara">
+            </a>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                {% if user.is_authenticated %}
+                    {% if user.perfil.rol == "PACIENTE" %}
+                        <li><a href="/dashboard/">Inicio</a></li>
+                        <li><a href="/emociones/">Mis Emociones</a></li>
+                        <li><a href="/citas/">Mis Citas</a></li>
+                        <li><a href="/actividades/">Mis Tareas</a></li>
+                    {% elif user.perfil.rol == "TERAPEUTA" %}
+                        <li><a href="/terapeuta/dashboard/">Inicio</a></li>
+                        <li><a href="/terapeuta/horarios/">Mis Horarios</a></li>
+                        <li><a href="/terapeuta/pacientes-disponibles/">Pacientes</a></li>
+                    {% elif user.perfil.rol == "ADMINISTRADOR" %}
+                        <li><a href="/admin/">Panel Admin</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="/">Inicio</a></li>
+                    <li><a href="#servicios">Servicios</a></li>
+                    <li><a href="#testimonios">Testimonios</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <div class="acciones-navbar" style="display: flex; align-items: center; gap: 12px;">
+            {% if user.is_authenticated %}
+                <span class="usuario-navbar">Hola, {{ user.username }}</span>
+                
+                <!-- Menú desplegable de Configuración: Solo para PACIENTE o TERAPEUTA 
+               #<div class="dropdown-config" style="position: relative; display: inline-block;">
+                    <a href="javascript:void(0);" onclick="toggleMenuConfig()" title="Configuración de cuenta" style="background: rgba(255, 255, 255, 0.2); color: white; width: 34px; height: 34px; border-radius: 50%; text-decoration: none; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background 0.3s;">
+                        ⚙️
+                    </a>
+
+                    <!-- Caja desplegable (Oculta por defecto) 
+                    <div id="menuConfigDropdown" style="display: none; position: absolute; right: 0; top: 45px; background: white; min-width: 220px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border-radius: 12px; overflow: hidden; z-index: 1000; border: 1px solid #eee; text-align: left;">
+                        <div style="padding: 12px 15px; background: #f9fbf9; border-bottom: 1px solid #eee;">
+                            <p style="margin: 0; font-size: 11px; color: #888; text-transform: uppercase;">Configuración</p>
+                            <p style="margin: 2px 0 0 0; font-size: 13px; font-weight: bold; color: #2D4A3E;">{{ user.username }}</p>
+                        </div>
+                        
+                        <!-- Opciones del menú corregidas 
+                        <a href="{% url 'actualizar_perfil' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none; font-size: 13px; border-bottom: 1px solid #f5f5f5; transition: background 0.2s;">
+                            👤 Actualizar Foto de Perfil
+                        </a>
+                        <a href="{% url 'cambiar_credenciales' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none; font-size: 13px; transition: background 0.2s;">
+                            🔑 Cambiar Contraseña / Correo
+                        </a>
+                    </div>
+                </div> 
+                {% endif %}-->
+
+                <a href="/logout/" class="btn-nav">Cerrar sesión</a>
+            {% else %}
+                <a href="/login/" class="btn-nav btn-login">Iniciar sesión</a>
+                <a href="/registro/" class="btn-nav btn-registro">Registrarse</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        {% block contenido %}
+        <!-- Sección Landing Principal -->
+        <section id="inicio" class="hero">
+            <div class="hero-content">
+                <h1>Tu diario emocional, tu mejor aliado</h1>
+                <p>Descubre cómo gestionar tus emociones y encuentra herramientas para vivir en mayor armonía, paz y felicidad.</p>
+                <div class="hero-buttons">
+                    <a href="#servicios" class="btn-primary">Quiero saber más</a>
+                    <a href="/registro/" class="btn-secondary">Registrarse</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="servicios" class="services">
+            <h2>¿Cómo te podemos ayudar?</h2>
+            <p class="section-subtitle">Ofrecemos un espacio confidencial y empático adaptado a tus necesidades.</p>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🌱</div>
+                    <h3>TERAPIA INDIVIDUAL</h3>
+                    <p>Un espacio para comprender tus emociones, superar bloqueos, manejar la ansiedad o depresión y recuperar tu equilibrio emocional.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🤝</div>
+                    <h3>TERAPIA DE PAREJA</h3>
+                    <p>Herramientas de comunicación asertiva para reconectar, resolver conflictos y reconstruir el compromiso mutuo.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🧸</div>
+                    <h3>TERAPIA INFANTIL</h3>
+                    <p>Ayudamos a identificar los aspectos del entorno del niño que afectan su desarrollo, orientándolo a él y a su familia.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonios" class="testimonials">
+            <h2>Lo que dicen nuestros pacientes</h2>
+            <div class="testimonials-container">
+                <div class="testimonial-box">
+                    <p>"La terapia fue de gran ayuda, me permitió darme cuenta de que lo más importante es uno mismo, aprender a valorarse y ganar seguridad."</p>
+                    <h4>- Diego (Terapia Individual)</h4>
+                </div>
+                <div class="testimonial-box">
+                    <p>"Nos ha abierto un espacio de encuentro en el cual nuestra relación de pareja ha mejorado la comunicación y el entendimiento familiar."</p>
+                    <h4>- Juliana (Terapia de Pareja)</h4>
+                </div>
+            </div>
+        </section>
+
+        <section id="contacto" class="contact">
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h2>Realiza un cambio en tu vida ahora</h2>
+                    <p>Estamos comprometidos con tu proceso de bienestar.</p>
+                    <div class="contact-details">
+                        <p><strong>📞 Teléfono:</strong> +57 315 258 4556</p>
+                        <p><strong>📧 Email:</strong> mentalidadclara.soporte@gmail.com</p>
+                    </div>
+                </div>
+                
+                <div class="contact-form">
+                    <h3>¿Listo para comenzar?</h3>
+                    <p>Crea tu cuenta para acceder a tu diario emocional y agendar citas.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="/registro/" class="btn-primary" style="display: block; text-align: center; margin-bottom: 10px; text-decoration: none;">Crear una Cuenta</a>
+                        <a href="/login/" class="btn-secondary" style="display: block; text-align: center; text-decoration: none;">Iniciar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Mentalidad Clara · SENA. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Script para abrir/cerrar el menú de la tuerca -->
+    <script>
+        function toggleMenuConfig() {
+            var menu = document.getElementById('menuConfigDropdown');
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+            } else {
+                menu.style.display = 'none';
+            }
+        }
+
+        // Ocultar el menú si hace clic fuera de él
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-config') && !event.target.closest('.dropdown-config')) {
+                var menu = document.getElementById('menuConfigDropdown');
+                if (menu && menu.style.display === 'block') {
+                    menu.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

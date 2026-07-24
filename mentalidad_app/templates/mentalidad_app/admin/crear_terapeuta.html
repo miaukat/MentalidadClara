@@ -1,0 +1,82 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Crear Terapeuta - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<div style="max-width: 600px; margin: 90px auto 40px auto; padding: 20px;">
+    
+    <div style="background: white; border-radius: 16px; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+        
+        <h2 style="color: #2D4A3E; margin-top: 0; margin-bottom: 10px; font-size: 22px;">Registrar Nuevo Terapeuta 👩‍⚕️</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 25px;">
+            El sistema generará una contraseña segura automáticamente y se la enviará al correo electrónico ingresado.
+        </p>
+
+        <!-- Bloque para mostrar errores si el usuario ya existe u ocurre un problema -->
+        {% if error %}
+            <div style="background: #f8d7da; color: #721c24; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; border: 1px solid #f5c6cb;">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <!-- Formulario sin action para asegurar que el token CSRF coincida perfectamente -->
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #333; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Nombre(s):</label>
+                <input type="text" name="nombre" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #333; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Apellido(s):</label>
+                <input type="text" name="apellido" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #333; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Nombre de Usuario (Username para login):</label>
+                <input type="text" name="username" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #333; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Correo Electrónico :</label>
+                <input type="email" name="email" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+            </div>
+
+            <!-- CAMPO: Fecha de Nacimiento -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #333; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Fecha de Nacimiento:</label>
+                <input type="date" name="fecha_nacimiento" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; color: #333; background: white;">
+            </div>
+
+            <!-- CAMPO: Especialidad (Desplegable) -->
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; color: #333; font-weight: 600; font-size: 14px; margin-bottom: 8px;">Especialidad:</label>
+                <select name="especialidad" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; background: white; color: #333; outline: none;">
+                    <option value="" disabled selected>-- Selecciona una especialidad --</option>
+                    <option value="Psicología Infantil">Psicología Infantil</option>
+                    <option value="Psicología Clínica">Psicología Clínica</option>
+                    <option value="Terapia Cognitivo-Conductual">Terapia Cognitivo-Conductual</option>
+                    <option value="Terapia Familiar y de Pareja">Terapia Familiar y de Pareja</option>
+                    <option value="Neuropsicología">Neuropsicología</option>
+                    <option value="Psicopedagogía">Psicopedagogía</option>
+                    <option value="Psicoterapia Humanista">Psicoterapia Humanista</option>
+                    <option value="Psicología Educativa">Psicología Educativa</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" style="flex: 1; background: #4A7C59; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 600; font-size: 15px; cursor: pointer;">
+                    Crear y Enviar Credenciales
+                </button>
+                <a href="{% url 'dashboard_admin' %}" style="flex: 1; background: #f0f0f0; color: #555; text-align: center; padding: 14px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; box-sizing: border-box;">
+                    Cancelar
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+{% endblock %}

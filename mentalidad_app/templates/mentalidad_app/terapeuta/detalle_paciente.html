@@ -1,0 +1,204 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Detalle de {{ paciente.usuario.get_full_name|default:paciente.usuario.username }} - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<div style="min-height: 100vh; background: linear-gradient(rgba(26, 46, 38, 0.88), rgba(45, 74, 62, 0.88)), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; background-attachment: fixed; padding: 100px 20px 40px 20px;">
+    
+    <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- Header con selector de paciente y botón para ver Registro Emocional / Gráficos -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: #2D4A3E; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">👤</div>
+                <div>
+                    <label style="font-size: 12px; color: #666; font-weight: 600; display: block; margin-bottom: 2px;">SELECCIONAR PACIENTE:</label>
+                    <select onchange="if (this.value) window.location.href=this.value;" style="padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; font-weight: 600; color: #2D4A3E; background: #fdfdfd; cursor: pointer; outline: none;">
+                        {% for p in mis_pacientes %}
+                            <option value="{% url 'detalle_paciente_terapeuta' p.id %}" {% if p.id == paciente.id %}selected{% endif %}>
+                                {{ p.usuario.get_full_name|default:p.usuario.username }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Nuevo botón para ver calendario y gráficos emocionales -->
+            <div>
+                <a href="{% url 'ver_registro_emocional_paciente' paciente.id %}" class="btn btn-success" style="background: #2D4A3E; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                📊 Ver Registro Emocional y Gráficos
+                </a>
+            </div>
+        </div>
+
+        <!-- Sección 1: Actividades Asignadas (Historial General) -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+            <h3 style="color: #2D4A3E; margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                📋 Actividades Asignadas
+            </h3>
+            
+            <div style="margin-top: 15px;">
+                {% if actividades_hoy %}
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        {% for act in actividades_hoy %}
+                            <div style="background: #f9fbf9; padding: 15px; border-radius: 10px; border: 1px solid #d1e7dd;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h4 style="margin: 0; color: #2D4A3E; font-size: 16px;">📌 {{ act.titulo }}</h4>
+                                    <!-- Muestra la fecha exacta y la hora en que se asignó -->
+                                    <span style="font-size: 12px; color: #555; background: #e2e8f0; padding: 3px 8px; border-radius: 6px; font-weight: 600;">
+                                        📅 {{ act.fecha_creacion|date:"d/m/Y" }} - ⏰ {{ act.fecha_creacion|date:"H:i" }} hrs
+                                    </span>
+                                </div>
+                                <p style="margin: 0; font-size: 14px; color: #444; background: white; padding: 10px; border-radius: 6px; border: 1px solid #eee;">
+                                    {{ act.descripcion|linebreaksbr }}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="padding: 20px; text-align: center; color: #777;">
+                        <p style="font-size: 14px; margin: 0;">No le has asignado actividades a este paciente todavía.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sección 2: Próximas Citas y Horarios Agendados -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+            <h3 style="color: #2D4A3E; margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                📅 Próximas Citas y Horarios Agendados
+            </h3>
+            
+            <div style="margin-top: 15px;">
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% for c in citas %}
+                    <li style="background: #f9fbf9; padding: 15px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #eee;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div>
+                                <span style="font-weight: 600; color: #2D4A3E; font-size: 15px;">🗓️ {{ c.horario.fecha }}</span>
+                                <span style="color: #555; margin-left: 12px; font-size: 14px;">
+                                    ⏰ De {{ c.horario.hora_inicio|time:"h:i A" }} a {{ c.horario.hora_fin|time:"h:i A" }}
+                                </span>
+                            </div>
+
+                            {% if c.estado == 'ACEPTADA' or c.estado == 'CONFIRMADA' %}
+                                <span style="background: #e8f5e9; color: #2e7d32; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                    {{ c.estado }}
+                                </span>
+                            {% else %}
+                                <span style="background: #fff3cd; color: #856404; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">
+                                    {{ c.estado }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% if c.motivo %}
+                            <p style="margin: 5px 0 0 0; font-size: 13px; color: #666; background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px dashed #ccc;">
+                                💬 <strong>Motivo:</strong> {{ c.motivo }}
+                            </p>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <div style="padding: 20px; text-align: center; color: #777;">
+                        <p style="font-size: 14px; margin: 0;">No hay reuniones o sesiones agendadas con este paciente.</p>
+                    </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Sección 3: Notas de Seguimiento Clínico -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                <h3 style="color: #2D4A3E; margin: 0; font-size: 18px;">
+                    📋 Notas de Seguimiento Clínico
+                </h3>
+                {% if nota.fecha_actualizacion %}
+                    <span style="font-size: 12px; color: #777;">
+                        Última edición: {{ nota.fecha_actualizacion|date:"d/m/Y H:i" }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <form method="POST" style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px;">
+                {% csrf_token %}
+                <textarea 
+                    name="contenido_nota" 
+                    rows="5" 
+                    placeholder="Escribe aquí observaciones privadas sobre el avance del paciente, temas tratados o apuntes para la siguiente sesión..." 
+                    style="width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #ccc; font-size: 14px; color: #333; resize: vertical; box-sizing: border-box; font-family: inherit;">{{ nota.contenido|default:'' }}</textarea>
+                
+                <div style="text-align: right;">
+                    <button type="submit" name="guardar_nota" style="background: #2D4A3E; color: white; padding: 10px 22px; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer;">
+                        💾 Guardar Notas
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección 4: Reportes de Comportamiento y Observaciones -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+            <h3 style="color: #2D4A3E; margin-top: 0; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                ⚠️ Reportes de Comportamiento e Incidencias
+            </h3>
+
+            <!-- Formulario para dejar un nuevo reporte -->
+            <form method="POST" action="{% url 'crear_reporte_comportamiento' paciente.id %}" style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+                {% csrf_token %}
+                <div>
+                    <label style="display: block; font-weight: 600; color: #2D4A3E; margin-bottom: 5px; font-size: 14px;">Tipo de Comportamiento:</label>
+                    <select name="tipo_comportamiento" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; background: white;">
+                        <option value="" disabled selected>Selecciona una opción...</option>
+                        <option value="Falta de Asistencia / Incumplimiento">Falta de Asistencia / Incumplimiento</option>
+                        <option value="Resistencia al Tratamiento">Resistencia al Tratamiento</option>
+                        <option value="Conducta Disruptiva o Inapropiada">Conducta Disruptiva o Inapropiada</option>
+                        <option value="Incumplimiento de Actividades">Incumplimiento de Actividades</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display: block; font-weight: 600; color: #2D4A3E; margin-bottom: 5px; font-size: 14px;">Descripción adicional / Notas del terapeuta:</label>
+                    <textarea name="descripcion" rows="3" placeholder="Escribe detalles adicionales sobre la situación..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; box-sizing: border-box; font-family: inherit; background: white;"></textarea>
+                </div>
+
+                <div>
+                    <button type="submit" style="background: #9c27b0; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        🚀 Guardar Reporte de Comportamiento
+                    </button>
+                </div>
+            </form>
+
+            <!-- Listado de reportes previos de este paciente -->
+            <div style="margin-top: 25px;">
+                <h4 style="color: #2D4A3E; font-size: 16px; margin-bottom: 12px;">Historial de Reportes Emitidos</h4>
+                {% if paciente.usuario.reportes_comportamiento.exists %}
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        {% for rep in paciente.usuario.reportes_comportamiento.all %}
+                            <div style="background: #fdf2f2; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                    <strong style="color: #721c24; font-size: 14px;">🚨 {{ rep.tipo_comportamiento }}</strong>
+                                    <span style="font-size: 12px; color: #666;">{{ rep.fecha|date:"d/m/Y H:i" }}</span>
+                                </div>
+                                {% if rep.descripcion %}
+                                    <p style="margin: 5px 0 0 0; font-size: 13px; color: #333;">{{ rep.descripcion }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: #666; font-size: 14px; font-style: italic; margin: 0;">No hay reportes de comportamiento registrados para este paciente.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Botón de Retorno -->
+        <div>
+            <a href="{% url 'dashboard_terapeuta' %}" style="background: rgba(255, 255, 255, 0.9); color: #2D4A3E; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block;">
+                ⬅️ Volver al Panel
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

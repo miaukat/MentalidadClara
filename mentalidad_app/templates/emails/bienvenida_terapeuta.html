@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #F4F8F5; margin: 0; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        
+        <!-- Encabezado -->
+        <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #E8F5E9;">
+            <h1 style="color: #2D4A3E; margin: 0; font-size: 24px;">🩺 ¡Bienvenido/a al Equipo Profesional!</h1>
+        </div>
+
+        <div style="padding: 20px 0; color: #444; line-height: 1.6;">
+            <p style="font-size: 16px;">Hola Dr./Dra. <strong>{{ usuario.first_name|default:usuario.username }}</strong>,</p>
+
+            <p>Nos alegra enormemente contar contigo en <strong>Mentalidad Clara</strong>. Gracias por formar parte de nuestro equipo de profesionales dedicados a acompañar la salud emocional de los usuarios.</p>
+
+            <!-- 🔑 SECCIÓN NUEVA: Credenciales de Acceso Integradas -->
+            <div style="background: #E8F5E9; border: 1px solid #C8E6C9; border-radius: 12px; padding: 20px; margin: 25px 0;">
+                <h3 style="color: #2D4A3E; margin: 0 0 10px 0; font-size: 16px;">🔐 Tus Credenciales de Acceso</h3>
+                <p style="margin: 0 0 12px 0; font-size: 14px; color: #333;">
+                    Usa los siguientes datos para iniciar sesión en la plataforma por primera vez:
+                </p>
+                <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #333;">
+                    <li style="margin-bottom: 8px;">👤 <strong>Usuario:</strong> <span style="font-family: monospace; background: #ffffff; padding: 3px 8px; border-radius: 4px; border: 1px solid #dcdcdc;">{{ username }}</span></li>
+                    <li>🔑 <strong>Contraseña temporal:</strong> <span style="font-family: monospace; background: #ffffff; padding: 3px 8px; border-radius: 4px; border: 1px solid #dcdcdc; color: #C62828; font-weight: bold;">{{ password }}</span></li>
+                </ul>
+                <p style="margin: 12px 0 0 0; font-size: 12px; color: #555;">
+                    <em>Te recomendamos iniciar sesión y cambiar tu contraseña por seguridad.</em>
+                </p>
+            </div>
+
+            <h3 style="color: #2D4A3E; margin-top: 25px;">💡 ¿Cómo funciona tu Panel Terapeuta?</h3>
+            
+            <ul style="padding-left: 20px;">
+                <li style="margin-bottom: 12px;">
+                    <strong>👥 Pacientes Asignados:</strong> Accede a la lista de pacientes bajo tu seguimiento y consulta la evolución de sus registros emocionales.
+                </li>
+                <li style="margin-bottom: 12px;">
+                    <strong>📈 Gráficos de Seguimiento:</strong> Visualiza estadísticas e información clave compartida por tus pacientes para enriquecer tus consultas.
+                </li>
+                <li style="margin-bottom: 12px;">
+                    <strong>📅 Agenda y Citas:</strong> Gestiona tu disponibilidad de atención y mantén organizadas tus sesiones programadas.
+                </li>
+                <li style="margin-bottom: 12px;">
+                    <strong>👤 Perfil Profesional:</strong> Personaliza tu foto, especialidad y número de contacto para que el sistema mantenga actualizada tu ficha.
+                </li>
+            </ul>
+
+            <!-- Sección de Seguridad y Reporte de Pacientes -->
+            <div style="background: #FFF3E0; border-left: 4px solid #FFA726; border-radius: 8px; padding: 18px; margin-top: 25px;">
+                <h4 style="color: #E65100; margin: 0 0 8px 0; font-size: 15px;">🛡️ Control de Seguridad y Convivencia</h4>
+                <p style="margin: 0; font-size: 14px; color: #5D4037; line-height: 1.5;">
+                    Tu tranquilidad y respeto son fundamentales. Desde tu panel profesional dispones de una herramienta para <strong>reportar a pacientes que cometan actos indebidos</strong>, conductas inapropiadas o faltas de respeto. Nuestro equipo de administración revisará cada caso prioritariamente para tomar las medidas correctivas oportunas.
+                </p>
+            </div>
+
+            <!-- Sección de Soporte -->
+            <div style="background: #E8F5E9; border-radius: 12px; padding: 20px; margin-top: 25px;">
+                <h4 style="color: #2D4A3E; margin: 0 0 10px 0;">💬 Soporte para Terapeutas</h4>
+                <p style="margin: 0; font-size: 14px; color: #333;">
+                    Si necesitas ayuda para configurar tu agenda, reasignar pacientes o tienes dudas sobre la plataforma:
+                </p>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px; font-size: 14px; color: #2D4A3E; font-weight: bold;">
+                    <li>📧 Correo de soporte: <a href="mentalidadclara.soporte@gmail.com" style="color: #4A7C59;">soporte@mentalidadclara.com</a></li>
+                    <li>📱 Línea directa / WhatsApp: +57 315 258 4556</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Pie de página -->
+        <div style="text-align: center; border-top: 1px solid #EEE; padding-top: 15px; font-size: 12px; color: #888;">
+            <p>© Mentalidad Clara - Plataforma de Acompañamiento Emocional</p>
+        </div>
+
+    </div>
+</body>
+</html>

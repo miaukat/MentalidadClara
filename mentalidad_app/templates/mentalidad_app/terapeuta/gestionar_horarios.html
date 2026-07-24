@@ -1,0 +1,118 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Gestionar Horarios - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<div style="max-width: 900px; margin: 90px auto 40px auto; padding: 20px;">
+    
+    <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 30px;">
+        <h2 style="color: #2D4A3E; margin-top: 0; font-size: 22px;">🕒 Registrar Nueva Disponibilidad</h2>
+        <p style="color: #666; font-size: 14px;">Selecciona los días y hasta 2 rangos horarios en los que estarás disponible para atender pacientes.</p>
+
+        <form method="POST" id="form-horarios" style="margin-top: 20px;">
+            {% csrf_token %}
+            
+            <!-- Días de la semana -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 10px;">Días de la semana</label>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <label style="border: 1px solid #4A7C59; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 6px; background: #F9FBF9;">
+                        <input type="checkbox" name="dias" value="Mon" style="accent-color: #4A7C59;"> Lun
+                    </label>
+                    <label style="border: 1px solid #4A7C59; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 6px; background: #F9FBF9;">
+                        <input type="checkbox" name="dias" value="Tue" style="accent-color: #4A7C59;"> Mar
+                    </label>
+                    <label style="border: 1px solid #4A7C59; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 6px; background: #F9FBF9;">
+                        <input type="checkbox" name="dias" value="Wed" style="accent-color: #4A7C59;"> Mie
+                    </label>
+                    <label style="border: 1px solid #4A7C59; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 6px; background: #F9FBF9;">
+                        <input type="checkbox" name="dias" value="Thu" style="accent-color: #4A7C59;"> Jue
+                    </label>
+                    <label style="border: 1px solid #4A7C59; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 6px; background: #F9FBF9;">
+                        <input type="checkbox" name="dias" value="Fri" style="accent-color: #4A7C59;"> Vie
+                    </label>
+                    <label style="border: 1px solid #4A7C59; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 6px; background: #F9FBF9;">
+                        <input type="checkbox" name="dias" value="Sat" style="accent-color: #4A7C59;"> Sab
+                    </label>
+                    <label style="border: 1px solid #4A7C59; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 6px; background: #F9FBF9;">
+                        <input type="checkbox" name="dias" value="Sun" style="accent-color: #4A7C59;"> Dom
+                    </label>
+                </div>
+            </div>
+
+            <!-- Rango horario (Máximo 2) -->
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 10px;">Rango horario <span style="font-weight: normal; color: #666;">(Máximo 2)</span></label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <label style="border: 1px solid #4A7C59; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 8px; background: #F9FBF9;">
+                        <input type="checkbox" name="rangos" value="Mañana" class="rango-checkbox" style="accent-color: #4A7C59;"> Mañana (8am - 12pm)
+                    </label>
+                    <label style="border: 1px solid #4A7C59; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 8px; background: #F9FBF9;">
+                        <input type="checkbox" name="rangos" value="Tarde" class="rango-checkbox" style="accent-color: #4A7C59;"> Tarde (2pm - 6pm)
+                    </label>
+                    <label style="border: 1px solid #4A7C59; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4A7C59; font-weight: 500; display: flex; align-items: center; gap: 8px; background: #F9FBF9;">
+                        <input type="checkbox" name="rangos" value="Noche" class="rango-checkbox" style="accent-color: #4A7C59;"> Noche (6pm - 9pm)
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" style="background: #4A7C59; color: white; padding: 12px 25px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%;">Guardar Disponibilidad</button>
+            </div>
+        </form>
+    </div>
+
+<!-- Listado de Horarios por Categorías -->
+    <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+        <h3 style="color: #2D4A3E; margin-top: 0; font-size: 18px;">Mis Categorías de Horarios Activos</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+            
+            <!-- Mañana -->
+            <div style="background: #f9fbf9; border: 1px solid #eee; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h4 style="color: #4A7C59; margin-top: 0;">🌅 Mañana (8am - 12pm)</h4>
+                    <p style="font-size: 13px; color: #666;">Registros activos para las próximas dos semanas.</p>
+                </div>
+                <a href="{% url 'detalle_horarios_categoria' 'manana' %}" style="background: #4A7C59; color: white; text-align: center; padding: 8px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 10px;">Ver Detalles</a>
+            </div>
+
+            <!-- Tarde -->
+            <div style="background: #f9fbf9; border: 1px solid #eee; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h4 style="color: #4A7C59; margin-top: 0;">☀️ Tarde (2pm - 6pm)</h4>
+                    <p style="font-size: 13px; color: #666;">Registros activos para las próximas dos semanas.</p>
+                </div>
+                <a href="{% url 'detalle_horarios_categoria' 'tarde' %}" style="background: #4A7C59; color: white; text-align: center; padding: 8px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 10px;">Ver Detalles</a>
+            </div>
+
+            <!-- Noche -->
+            <div style="background: #f9fbf9; border: 1px solid #eee; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h4 style="color: #4A7C59; margin-top: 0;">🌙 Noche (6pm - 9pm)</h4>
+                    <p style="font-size: 13px; color: #666;">Registros activos para las próximas dos semanas.</p>
+                </div>
+                <a href="{% url 'detalle_horarios_categoria' 'noche' %}" style="background: #4A7C59; color: white; text-align: center; padding: 8px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 10px;">Ver Detalles</a>
+            </div>
+
+        </div>
+        <div style="margin-top: 25px;">
+            <a href="{% url 'dashboard_terapeuta' %}" style="color: #2D4A3E; text-decoration: none; font-weight: 600;">⬅️ Volver al Panel</a>
+        </div>
+    </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.rango-checkbox');
+        
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                const checkedCount = document.querySelectorAll('.rango-checkbox:checked').length;
+                if (checkedCount > 2) {
+                    alert('Solo puedes seleccionar un máximo de 2 rangos horarios.');
+                    this.checked = false;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

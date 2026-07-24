@@ -1,0 +1,90 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Agendar Cita - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<div style="padding: 40px 20px; max-width: 950px; margin: 0 auto; min-height: 85vh;">
+    
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="color: #4A7C59; font-size: 28px;">Agendar Cita</h2>
+        <p style="color: #666; font-size: 15px;">Agenda citas con especialistas y recibe acompañamiento psicológico de calidad.</p>
+    </div>
+
+    <!-- Sección de Terapeutas Favoritos -->
+    {% if terapeutas_favoritos %}
+    <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); margin-bottom: 30px;">
+        <h3 style="color: #4A7C59; margin-bottom: 15px; font-size: 18px; border-bottom: 2px solid #E8F5E9; padding-bottom: 8px;">⭐ Tus Terapeutas Favoritos</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+            {% for fav in terapeutas_favoritos %}
+                <div style="background: #F9FBF9; border: 1px solid #D1E7DD; border-radius: 10px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: #2D4A3E; font-size: 14px; display: block;">Dr(a). {{ fav.usuario.get_full_name|default:fav.usuario.username }}</strong>
+                        <span style="color: #666; font-size: 12px;">{{ fav.especialidad }}</span>
+                    </div>
+                    <button type="button" 
+                        data-id="{{ fav.id }}" 
+                        onclick="toggleFavorito(this.dataset.id)" 
+                        style="background-color: transparent; border: none; font-size: 20px; cursor: pointer;" 
+                        title="Quitar de favoritos">
+                        ⭐
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Lista Directa de Horarios Disponibles -->
+    <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); margin-bottom: 40px;">
+        <h3 style="color: #4A7C59; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #E8F5E9; padding-bottom: 10px;">Horarios Disponibles</h3>
+
+        {% if horarios %}
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                {% for h in horarios %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #F9FBF9; border: 1px solid #D1E7DD; border-radius: 10px;">
+                        <div>
+                            <strong style="color: #2D4A3E; display: block; font-size: 15px;">Dr(a). {{ h.terapeuta.get_full_name|default:h.terapeuta.username }}</strong>
+                            <span style="color: #666; font-size: 13px;">Fecha: {{ h.fecha|date:"l, d \d\e F \d\e Y" }} ({{ h.hora_inicio|time:"h:i A" }} - {{ h.hora_fin|time:"h:i A" }})</span>
+                        </div>
+                        <a href="{% url 'confirmar_cita' h.id %}" style="background-color: #4A7C59; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600;">Seleccionar</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 30px; background: #FFF9C4; border-radius: 12px; color: #856404;">
+                <p style="margin: 0; font-weight: 600;">En este momento no hay horarios de atención disponibles.</p>
+                <small style="display: block; margin-top: 5px;">Por favor ingresa más tarde cuando los terapeutas publiquen nuevos turnos.</small>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<div style="display:none;">
+    <form id="csrf-form">{% csrf_token %}</form>
+</div>
+
+<script>
+function toggleFavorito(terapeutaId) {
+    const inputToken = document.querySelector('#csrf-form input[name="csrfmiddlewaretoken"]');
+    if (!inputToken) return;
+    const csrftoken = inputToken.value;
+
+    fetch(`/terapeuta/${terapeutaId}/favorito/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'mentalidad_app/home.html' %}
+
+{% block title %}Iniciar Sesión - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<style>
+    /* Ocultar la barra de navegación superior solo en la pantalla de login */
+    .navbar {
+        display: none !important;
+    }
+</style>
+
+<section style="min-height: 100vh; padding: 50px 20px; display: flex; align-items: center; justify-content: center; background: linear-gradient(rgba(30, 50, 35, 0.45), rgba(30, 50, 35, 0.45)), url('https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat fixed;">
+    <div style="width: 100%; max-width: 450px; background: rgba(255, 255, 255, 0.96); padding: 35px 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); backdrop-filter: blur(6px); margin: 30px auto;">
+        <h2 style="text-align: center; color: #4A7C59; font-family: 'Playfair Display', serif; margin-bottom: 8px; font-size: 28px;">Bienvenido de Nuevo</h2>
+        <p style="text-align: center; color: #555; font-size: 14px; margin-bottom: 25px;">Ingresa con tu usuario o correo para continuar con tu proceso.</p>
+
+        {% if error %}
+            <div style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid #f5c6cb;">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="/login/">
+            {% csrf_token %}
+            
+            <!-- CAMBIO: Ahora acepta Usuario o Correo -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; color: #333;">Nombre de Usuario o Correo Electrónico</label>
+                <input type="text" name="username" required placeholder="Ej. tu_usuario o correo@dominio.com" style="width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+            </div>
+
+            <!-- Contraseña con botón de mostrar/ocultar -->
+            <div style="margin-bottom: 25px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <label style="font-weight: 600; font-size: 14px; color: #333; margin: 0;">Contraseña</label>
+                    <a href="/recuperar-password/" style="color: #4A7C59; font-size: 13px; text-decoration: none; font-weight: 500;">¿Olvidaste tu contraseña?</a>
+                </div>
+                <div style="position: relative;">
+                    <input type="password" name="password" id="password_login" required style="width: 100%; padding: 10px 40px 10px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                    <button type="button" onclick="togglePasswordLogin()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #666; font-size: 16px;">
+                        <span id="icon-eye-login">👁️‍🗨️</span>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 600; color: white; background-color: #4A7C59; border: none; border-radius: 8px; cursor: pointer; transition: background 0.3s;">Iniciar Sesión</button>
+        </form>
+
+        <p style="text-align: center; margin-top: 20px; font-size: 14px; color: #555;">
+            ¿Aún no tienes cuenta? <a href="/registro/" style="color: #4A7C59; font-weight: 600; text-decoration: none;">Regístrate aquí</a>
+        </p>
+    </div>
+</section>
+
+<script>
+    // Script para mostrar/ocultar la contraseña en el login
+    function togglePasswordLogin() {
+        const input = document.getElementById('password_login');
+        const icon = document.getElementById('icon-eye-login');
+        if (input.type === "password") {
+            input.type = "text";
+            icon.textContent = "👁️";
+        } else {
+            input.type = "password";
+            icon.textContent = "👁️‍🗨️";
+        }
+    }
+</script>
+{% endblock %}

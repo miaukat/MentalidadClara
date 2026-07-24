@@ -1,0 +1,95 @@
+{% extends 'mentalidad_app/home.html' %}
+
+{% block title %}Registro de Emociones - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<div style="max-width: 900px; margin: 40px auto; padding: 20px;">
+    
+    <!-- Botón para volver al Dashboard -->
+    <a href="{% url 'dashboard_paciente' %}" style="text-decoration: none; color: #4A7C59; font-weight: 600; display: inline-block; margin-bottom: 20px;">
+        ← Volver al Panel Principal
+    </a>
+
+    <!-- SECCIÓN 1: REGISTRO DE EMOCIÓN DE HOY -->
+    <div style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px;">
+        <h2 style="color: #2D4A3E; margin-bottom: 10px; font-size: 26px;">😊 Registro de Emociones</h2>
+        <p style="color: #666; font-size: 15px; margin-bottom: 25px;">
+            Registra cómo te sientes diariamente y lleva un seguimiento continuo de tu bienestar emocional.
+        </p>
+
+        <form method="POST" action="{% url 'registrar_emocion_diario' %}">
+            {% csrf_token %}
+            
+            <!-- Indicador para backend -->
+            <input type="hidden" name="tipo_registro" value="EMOCION">
+
+            <label style="display: block; font-weight: 600; color: #333; margin-bottom: 15px;">¿Cómo te sientes hoy?</label>
+            
+            <!-- Catálogo Ampliado de Emociones -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                
+                <label style="border: 2px solid #E0E0E0; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; display: block;">
+                    <input type="radio" name="emocion_principal" value="ALEGRE" required style="margin-bottom: 8px;"><br>
+                    <span style="font-size: 28px;">😊</span><br>
+                    <span style="font-size: 14px; font-weight: 600; color: #333;">Alegre</span>
+                </label>
+
+                <label style="border: 2px solid #E0E0E0; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; display: block;">
+                    <input type="radio" name="emocion_principal" value="TRANQUILO" style="margin-bottom: 8px;"><br>
+                    <span style="font-size: 28px;">😌</span><br>
+                    <span style="font-size: 14px; font-weight: 600; color: #333;">Tranquilo/a</span>
+                </label>
+
+                <label style="border: 2px solid #E0E0E0; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; display: block;">
+                    <input type="radio" name="emocion_principal" value="MOTIVADO" style="margin-bottom: 8px;"><br>
+                    <span style="font-size: 28px;">✨</span><br>
+                    <span style="font-size: 14px; font-weight: 600; color: #333;">Motivado/a</span>
+                </label>
+
+                <label style="border: 2px solid #E0E0E0; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; display: block;">
+                    <input type="radio" name="emocion_principal" value="CANSADO" style="margin-bottom: 8px;"><br>
+                    <span style="font-size: 28px;">😴</span><br>
+                    <span style="font-size: 14px; font-weight: 600; color: #333;">Cansado/a</span>
+                </label>
+
+                <label style="border: 2px solid #E0E0E0; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; display: block;">
+                    <input type="radio" name="emocion_principal" value="ANSIOSO" style="margin-bottom: 8px;"><br>
+                    <span style="font-size: 28px;">😰</span><br>
+                    <span style="font-size: 14px; font-weight: 600; color: #333;">Ansioso/a</span>
+                </label>
+
+                <label style="border: 2px solid #E0E0E0; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; display: block;">
+                    <input type="radio" name="emocion_principal" value="TRISTE" style="margin-bottom: 8px;"><br>
+                    <span style="font-size: 28px;">😢</span><br>
+                    <span style="font-size: 14px; font-weight: 600; color: #333;">Triste</span>
+                </label>
+
+                <label style="border: 2px solid #E0E0E0; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; display: block;">
+                    <input type="radio" name="emocion_principal" value="FRUSTRADO" style="margin-bottom: 8px;"><br>
+                    <span style="font-size: 28px;">😤</span><br>
+                    <span style="font-size: 14px; font-weight: 600; color: #333;">Frustrado/a</span>
+                </label>
+
+            </div>
+
+            <!-- Nivel de Intensidad -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; color: #333; margin-bottom: 8px;">Intensidad (1 al 10)</label>
+                <input type="range" name="intensidad" min="1" max="10" value="5" style="width: 100%;">
+            </div>
+
+            <!-- Nota breve opcional -->
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 600; color: #333; margin-bottom: 8px;">¿Qué desencadenó esta emoción? (Opcional)</label>
+                <input type="text" name="descripcion" placeholder="Ej: Mucho trabajo en el día, una buena noticia..." 
+                       style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+            </div>
+
+            <button type="submit" style="background-color: #4A7C59; color: white; border: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                Guardar Emoción
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

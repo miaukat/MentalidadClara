@@ -1,0 +1,322 @@
+{% extends 'mentalidad_app/home.html' %}
+{% load static %}
+
+{% block title %}Panel de Terapeuta - Mentalidad Clara{% endblock %}
+
+{% block contenido %}
+<!-- Contenedor principal con imagen de fondo profesional y filtro oscuro -->
+<div style="min-height: 100vh; background: linear-gradient(rgba(26, 46, 38, 0.88), rgba(45, 74, 62, 0.88)), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; background-attachment: fixed; padding: 100px 20px 40px 20px;">
+    
+    <div style="max-width: 1200px; margin: 0 auto;">
+        
+        <!-- Encabezado del Terapeuta -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); color: #2D4A3E; border-radius: 16px; padding: 30px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                {% if request.user.perfil.foto %}
+                    <img src="{{ request.user.perfil.foto.url }}" alt="Foto de perfil" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #4A7C59;">
+                {% else %}
+                    <div style="width: 70px; height: 70px; border-radius: 50%; background: #4A7C59; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white;">🩺</div>
+                {% endif %}
+                <div>
+                    <h1 style="margin: 0 0 5px 0; font-size: 24px;">Dr(a). {{ request.user.first_name }} {{ request.user.last_name }}</h1>
+                    <p style="margin: 0; color: #666; font-size: 14px;">Panel Clínico y Gestión de Pacientes</p>
+                </div>
+            </div>
+            <div>
+                <a href="{% url 'gestionar_horarios_terapeuta' %}" style="background: #2D4A3E; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    🕒 Configurar Mis Horarios
+                </a>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas del Terapeuta -->
+        <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+            <a href="{% url 'ver_pacientes_disponibles' %}" style="background: rgba(255, 255, 255, 0.9); color: #2D4A3E; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); backdrop-filter: blur(5px);">
+                👥 Ver Pacientes Disponibles para Asignar
+            </a>
+            <a href="{% url 'crear_actividad_terapeuta' %}" style="background: #4A7C59; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                📝 Asignar Actividad Emocional
+            </a>
+        </div>
+
+        <!-- SECCIÓN: Solicitudes de Citas Pendientes -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); margin-bottom: 30px;">
+            <h3 style="color: #2D4A3E; margin-top: 0; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                🔔 Solicitudes de Citas Pendientes por Aprobar
+            </h3>
+
+            {% if citas_pendientes %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
+                    {% for cita in citas_pendientes %}
+                        <div style="background: #F9FBF9; border: 1px solid #D1E7DD; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                            <p style="margin: 0 0 6px 0; color: #2D4A3E; font-size: 15px;"><strong>Paciente:</strong> {{ cita.paciente.first_name }} {{ cita.paciente.last_name|default:cita.paciente.username }}</p>
+                            <p style="margin: 0 0 6px 0; color: #555; font-size: 14px;">📅 <strong>Fecha:</strong> {{ cita.horario.fecha|date:"l, d \d\e F \d\e Y" }}</p>
+                            <p style="margin: 0 0 6px 0; color: #555; font-size: 14px;">⏰ <strong>Hora:</strong> {{ cita.horario.hora_inicio|time:"h:i A" }} - {{ cita.horario.hora_fin|time:"h:i A" }}</p>
+                            <p style="margin: 0 0 12px 0; color: #555; background: white; padding: 8px; border-radius: 6px; font-size: 13px; border: 1px solid #eee;">
+                                <strong>Motivo:</strong> {{ cita.motivo|default:"No especificado" }}
+                            </p>
+
+                            <!-- Botones Aceptar / Rechazar -->
+                            <div style="display: flex; gap: 10px;">
+                                <a href="{% url 'terapeuta_aceptar_cita' cita.id %}" style="flex: 1; text-align: center; background-color: #4A7C59; color: white; padding: 8px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;">Aceptar</a>
+                                <a href="{% url 'terapeuta_rechazar_cita' cita.id %}" style="flex: 1; text-align: center; background-color: #d9534f; color: white; padding: 8px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;">Rechazar</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="margin: 0; color: #666; font-size: 14px; text-align: center; padding: 10px;">No tienes solicitudes de citas pendientes en este momento.</p>
+            {% endif %}
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL: Mis Pacientes Asignados -->
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);">
+            <h3 style="color: #2D4A3E; margin-top: 0; margin-bottom: 20px; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                📋 Mis Pacientes Asignados
+            </h3>
+            
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                    <thead>
+                        <tr style="background: #f9fbf9; color: #2D4A3E; border-bottom: 2px solid #e0e0e0;">
+                            <th style="padding: 12px;">Paciente</th>
+                            <th style="padding: 12px;">Correo</th>
+                            <th style="padding: 12px;">Teléfono</th>
+                            <th style="padding: 12px; text-align: center;">Acciones / Expediente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in mis_pacientes %}
+                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                            <td style="padding: 12px; font-weight: 500; color: #333;">
+                                {{ p.usuario.first_name }} {{ p.usuario.last_name }}
+                            </td>
+                            <td style="padding: 12px; color: #666;">{{ p.usuario.email }}</td>
+                            <td style="padding: 12px; color: #666;">{{ p.telefono|default:"No registrado" }}</td>
+                            <td style="padding: 12px; text-align: center; display: flex; gap: 8px; justify-content: center; align-items: center;">
+                                <!-- Botón para Ver el Perfil -->
+                                <a href="{% url 'ver_perfil_paciente' p.id %}" style="background: #4A7C59; color: white; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">
+                                    Ver Perfil
+                                </a>
+                                <!-- Botón de estadísticas y registros -->
+                                <a href="{% url 'detalle_paciente_terapeuta' p.id %}" style="background: #2D4A3E; color: white; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600;">
+                                    Ver Estadísticas y Registros
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="padding: 20px; text-align: center; color: #777;">Aún no tienes pacientes asignados. Revisa la sección de pacientes disponibles para tomar uno.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= CHAT FLOTANTE PARA EL TERAPEUTA ================= -->
+{% if request.user.is_authenticated and request.user.perfil.rol == 'TERAPEUTA' %}
+<style>
+    #btn-chat-terapeuta {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #2D4A3E;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        cursor: pointer;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.3s;
+    }
+    #btn-chat-terapeuta:hover {
+        background-color: #1e332a;
+    }
+
+    #drawer-terapeuta {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 380px;
+        height: 100%;
+        background: white;
+        box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+        z-index: 10000;
+        transition: right 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+    }
+    #drawer-terapeuta.abierto {
+        right: 0;
+    }
+
+    .burbuja-chat {
+        background-color: #e2ede6;
+        border-radius: 12px 12px 0 12px;
+        padding: 10px 14px;
+        margin-bottom: 12px;
+        max-width: 85%;
+        margin-left: auto;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        text-align: right;
+    }
+    .burbuja-texto {
+        font-size: 14px;
+        color: #2D4A3E;
+        margin: 0 0 5px 0;
+        word-wrap: break-word;
+    }
+    .burbuja-info {
+        font-size: 10px;
+        color: #555;
+        font-weight: bold;
+        margin-bottom: 4px;
+        display: block;
+    }
+    .burbuja-hora {
+        font-size: 10px;
+        color: #777;
+    }
+</style>
+
+<!-- Botón flotante del terapeuta -->
+<button id="btn-chat-terapeuta" onclick="toggleChatTerapeuta()">
+    💬 Enviar Mensaje Rápido
+</button>
+
+<!-- Panel lateral con el selector arriba -->
+<div id="drawer-terapeuta">
+    <div style="background: #2D4A3E; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-size: 16px;">Panel de Mensajes a Pacientes</h3>
+        <button onclick="toggleChatTerapeuta()" style="background: none; border: none; color: white; font-size: 22px; cursor: pointer;">&times;</button>
+    </div>
+    
+    <div style="padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;">
+        
+        <!-- SECCIÓN SUPERIOR: Selector de Paciente -->
+        <div style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+            <label for="paciente_destinatario" style="font-size: 13px; font-weight: bold; color: #2D4A3E; display: block; margin-bottom: 5px;">👤 Seleccionar Paciente:</label>
+            <select id="paciente_destinatario" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+            {% if pacientes_asignados %}
+                {% for paciente in pacientes_asignados %}
+                    <option value="{{ paciente.usuario.id }}">{{ paciente }}</option>
+                {% endfor %}
+            {% else %}
+                <option value="" disabled>No tienes pacientes asignados</option>
+            {% endif %}
+            </select>
+        </div>
+
+        <!-- CENTRO: Historial de mensajes recientes (CARGADO DESDE LA BASE DE DATOS USANDO 'fecha') -->
+        <div id="historial-chat" style="flex: 1; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; display: flex; flex-direction: column;">
+            {% if mensajes_enviados %}
+                {% for msg in mensajes_enviados %}
+                    <div class="burbuja-chat">
+                        <span class="burbuja-info">Para: {{ msg.destinatario.first_name }} {{ msg.destinatario.last_name }}</span>
+                        <p class="burbuja-texto">{{ msg.texto }}</p>
+                        <span class="burbuja-hora">{{ msg.fecha|time:"h:i A" }}</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #888; font-size: 12px; text-align: center; margin-top: 10px;" id="mensaje-vacio-historial">
+                    Los mensajes enviados aparecerán aquí.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- PARTE INFERIOR: Selector de Mensaje y Botón -->
+        <div style="border-top: 1px solid #eee; padding-top: 15px;">
+            <label for="mensaje_rapido" style="font-size: 13px; font-weight: bold; color: #2D4A3E; display: block; margin-bottom: 5px;">💬 Elige el mensaje:</label>
+            <select id="mensaje_rapido" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box;">
+                <option value="Buenos días, espero que tengas un excelente día de bienestar.">🌅 Buenos días</option>
+                <option value="Buenas tardes, te deseo una excelente tarde.">☀️ Buenas tardes</option>
+                <option value="Buenas noches, recuerda descansar y reflexionar positivamente.">🌙 Buenas noches</option>
+                <option value="Recordatorio: Hoy tenemos nuestra sesión programada. ¡Te espero!">📅 Hoy tenemos reunión / cita</option>
+                <option value="Recordatorio: Mañana tenemos nuestra sesión programada.">🗓️ Mañana tenemos reunión / cita</option>
+                <option value="Por favor, recuerda completar tus registros de emociones y actividades pendientes.">📝 Recordatorio de actividades</option>
+            </select>
+
+            <button type="button" onclick="enviarMensajeAPaciente()" style="width: 100%; background: #4A7C59; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.3s;">
+                Enviar Mensaje
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleChatTerapeuta() {
+        const drawer = document.getElementById('drawer-terapeuta');
+        drawer.classList.toggle('abierto');
+    }
+
+    async function enviarMensajeAPaciente() {
+        const selectPaciente = document.getElementById('paciente_destinatario');
+        if (!selectPaciente || selectPaciente.value === "" || selectPaciente.options.length === 0) {
+            alert('Por favor selecciona un paciente válido para enviar el mensaje.');
+            return;
+        }
+        
+        const pacienteId = selectPaciente.value;
+        const nombrePaciente = selectPaciente.options[selectPaciente.selectedIndex].text;
+
+        const selectMensaje = document.getElementById('mensaje_rapido');
+        const textoMensaje = selectMensaje.value;
+
+        try {
+            const response = await fetch("{% url 'enviar_mensaje_chat' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    paciente_id: pacienteId,
+                    mensaje: textoMensaje
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const historial = document.getElementById('historial-chat');
+
+                const mensajeVacio = document.getElementById('mensaje-vacio-historial');
+                if (mensajeVacio) {
+                    mensajeVacio.remove();
+                }
+
+                const ahora = new Date();
+                const horaFormateada = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const burbuja = document.createElement('div');
+                burbuja.className = 'burbuja-chat';
+                burbuja.innerHTML = `
+                    <span class="burbuja-info">Para: ${nombrePaciente}</span>
+                    <p class="burbuja-texto">${textoMensaje}</p>
+                    <span class="burbuja-hora">${horaFormateada}</span>
+                `;
+
+                historial.appendChild(burbuja);
+                historial.scrollTop = historial.scrollHeight;
+            } else {
+                alert('Error al enviar el mensaje: ' + (data.message || 'Intenta nuevamente.'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ocurrió un error de conexión al enviar el mensaje.');
+        }
+    }
+</script>
+{% endif %}
+<!-- ================= FIN CHAT FLOTANTE TERAPEUTA ================= -->
+{% endblock %}
